@@ -108,6 +108,23 @@ con quello dei registri). La scansione si può rifare con
 Registri volutamente esclusi (da aggiungere dopo verifica sul campo):
 gruppo "COMANDI TEST" (PT01-PT11).
 
+## Stato verifica registri non documentati
+
+Registri ricavati da scansione e non presenti nel manuale Sinergia. Se hai la
+stessa macchina e puoi confermarne (o smentirne) uno, apri una
+[issue](https://github.com/riccardorossi92/ha-sinergia-vmc/issues).
+
+| Registri | Contenuto | Lettura | Scrittura |
+|---|---|---|---|
+| 1499-1582 | Programma fasce orarie (tipo + orario) | ✅ coincide con il pannello | ⏳ da verificare (action `set_time_band`) |
+| 1106 | Fascia oraria attiva | ⏳ da verificare a un cambio di fascia | — |
+| 1779 | PH03 - fasce orarie abilitate | ✅ | ⏳ da verificare |
+| 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ⏳ da verificare |
+| 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ⏳ da verificare |
+| 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ⏳ da verificare (dedotti dai valori) | ⏳ da verificare |
+| 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
+| 1602-1613 | Contatori ore, limiti, ultima manutenzione | ✅ valori plausibili | ⏳ da verificare (limiti) |
+
 ## Licenza
 
 [MIT](LICENSE)
