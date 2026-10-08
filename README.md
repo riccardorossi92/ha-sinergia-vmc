@@ -83,7 +83,7 @@ con quello dei registri). La scansione si può rifare con
 [`tools/modbus_scan.py`](tools/modbus_scan.py) (gateway Modbus TCP, sola lettura).
 
 Registri volutamente esclusi (da aggiungere dopo verifica sul campo):
-gruppo "COMANDI TEST" (PT01-PT11) e word alte a 32 bit dei contatori ore filtri.
+gruppo "COMANDI TEST" (PT01-PT11).
 
 ## Licenza
 

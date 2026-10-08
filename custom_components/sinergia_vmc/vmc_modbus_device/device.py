@@ -20,7 +20,7 @@ from __future__ import annotations
 from enum import IntEnum
 
 from modbus_connection.model import Component, Device
-from modbus_connection.model.fields import boolean, enum, gauge, integer
+from modbus_connection.model.fields import boolean, enum, gauge, integer, uint32
 
 __all__ = [
     "Alarms",
@@ -204,6 +204,10 @@ class Status(Component):
     freecooling_heating_request = boolean(1132)
     recirc_damper_status = enum(1134, RecircDamperStatusCode)
 
+    board_clock = uint32(1101, word_order="little")
+    """Orologio (RTC) della scheda, in secondi dal 2000-01-01, ora locale.
+    NON documentato da Sinergia: dedotto da scansione."""
+
     active_time_band = integer(1106, signed=False)
     """Fascia oraria attiva (valori di `TimeBandCode`). NON documentato da
     Sinergia: dedotto da scansione (vale 2=Comfort durante la fascia Comfort),
@@ -211,15 +215,31 @@ class Status(Component):
 
 
 class Maintenance(Component):
-    """Contatori ore di funzionamento (R/O; solo word bassa, valore x10)."""
+    """Contatori ore di funzionamento e manutenzione (EVCO PM00-PM04, PM90).
+
+    Valori a 32 bit (word bassa all'indirizzo indicato, word alta al
+    successivo), espressi direttamente in ore: il pannello li mostra in
+    "ore x10" (es. 906.8 sul display = 9068 h, cfr. esempio del manuale
+    Sinergia "450 = 4500 h").
+    """
 
     register_space = "holding"
 
-    supply_fan_hours = gauge(1604, 0.1, signed=False, unit="h")
-    """Ore di funzionamento ventilatore mandata rispetto al limite impostato
-    in `Command.fans_hours_limit`. Nota: nel manuale questo registro ha
-    anche una word alta (32 bit complessivi); qui viene letta solo la word
-    bassa, sufficiente per contatori entro ~6553 ore."""
+    supply_fan_hours = uint32(1604, word_order="little", unit="h")
+    """PM01 - ore di funzionamento ventilatore mandata."""
+
+    return_fan_hours = uint32(1606, word_order="little", unit="h")
+    """PM02 - ore di funzionamento ventilatore ripresa."""
+
+    compressor_hours_limit = uint32(1608, word_order="little", writable=True, unit="h")
+    """PM03 - limite ore compressore oltre il quale scatta l'allarme."""
+
+    compressor_hours = uint32(1610, word_order="little", unit="h")
+    """PM04 - ore di funzionamento compressore."""
+
+    last_maintenance = uint32(1612, word_order="little")
+    """PM90 - data ultima manutenzione, in secondi dal 2000-01-01 (ora locale
+    della scheda). 2008-01-01 = mai impostata."""
 
 
 # --------------------------------------------------------------------------- #
@@ -285,9 +305,10 @@ class Command(Component):
     reset_alarm_al12 = boolean(786, writable=True)
     """Reset manuale allarme AL12 (alta pressione compressore) - impulso."""
 
-    fans_hours_limit = gauge(1603, 0.1, signed=False, writable=True, unit="h")
-    """M00 - limite ore di lavoro ventilatori oltre il quale scatta
-    l'allarme filtri sporchi (default 200.0h, i.e. raw 2000)."""
+    fans_hours_limit = uint32(1602, word_order="little", writable=True, unit="h")
+    """M00/PM00 - limite ore di lavoro ventilatori oltre il quale scatta
+    l'allarme filtri sporchi (32 bit, in ore; default 20000 h = "2000.0"
+    sul pannello)."""
 
 
 class Setpoints(Component):

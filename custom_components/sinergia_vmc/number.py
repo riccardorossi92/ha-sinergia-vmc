@@ -205,7 +205,13 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         component="command", attr="fans_hours_limit",
         name="Limite Ore Ventilatori (M00, allarme filtri)",
         unique_id_suffix="fans_hours_limit", unit="h",
-        min_value=0, max_value=9999, step=0.5, diagnostic=True,
+        min_value=0, max_value=99990, step=10, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="maintenance", attr="compressor_hours_limit",
+        name="Limite Ore Compressore (M03)",
+        unique_id_suffix="compressor_hours_limit", unit="h",
+        min_value=0, max_value=99990, step=10, diagnostic=True,
     ),
 )
 

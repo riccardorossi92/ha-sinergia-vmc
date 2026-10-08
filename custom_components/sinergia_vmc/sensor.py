@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from enum import IntEnum
 
 from homeassistant.components.sensor import (
@@ -13,6 +14,7 @@ from homeassistant.components.sensor import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.util import dt as dt_util
 
 from .coordinator import SinergiaVmcConfigEntry
 from .entity import VmcEntity
@@ -26,6 +28,10 @@ from .vmc_modbus_device.device import (
 # La scheda segnala una sonda assente/guasta con valori sentinella
 # 0x80xx (es. 0x8004 = -32764 -> -3276.4 °C dopo la scala 0.1).
 PROBE_ERROR_THRESHOLD = -3000.0
+
+# Date/ore della scheda: secondi dal 2000-01-01, nell'ora locale impostata
+# sul pannello (senza fuso orario).
+BOARD_EPOCH = datetime(2000, 1, 1)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -41,6 +47,7 @@ class VmcSensorSpec:
     enum_valued: bool = False
     enabled_default: bool = True
     enum_type: type[IntEnum] | None = None  # converte un intero grezzo in nome enum
+    board_datetime: bool = False  # secondi dal 2000-01-01 -> timestamp
 
 
 SENSORS: tuple[VmcSensorSpec, ...] = (
@@ -147,7 +154,30 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
     VmcSensorSpec(
         component="maintenance", attr="supply_fan_hours", name="Ore Ventilatore Mandata",
         unique_id_suffix="supply_fan_hours", unit="h",
+        device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    VmcSensorSpec(
+        component="maintenance", attr="return_fan_hours", name="Ore Ventilatore Ripresa",
+        unique_id_suffix="return_fan_hours", unit="h",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    VmcSensorSpec(
+        component="maintenance", attr="compressor_hours", name="Ore Compressore",
+        unique_id_suffix="compressor_hours", unit="h",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    VmcSensorSpec(
+        component="maintenance", attr="last_maintenance", name="Ultima Manutenzione",
+        unique_id_suffix="last_maintenance", board_datetime=True,
+        device_class=SensorDeviceClass.TIMESTAMP, entity_category="diagnostic",
+    ),
+    VmcSensorSpec(
+        component="status", attr="board_clock", name="Orologio Scheda",
+        unique_id_suffix="board_clock", board_datetime=True,
+        device_class=SensorDeviceClass.TIMESTAMP, entity_category="diagnostic",
     ),
     # --- Allarmi (bitmask grezze, utili per template/diagnostica) ---
     VmcSensorSpec(
@@ -191,6 +221,10 @@ class VmcSensor(VmcEntity, SensorEntity):
             return None
         if self._spec.enum_valued and isinstance(value, IntEnum):
             return value.name
+        if self._spec.board_datetime:
+            return (BOARD_EPOCH + timedelta(seconds=value)).replace(
+                tzinfo=dt_util.get_default_time_zone()
+            )
         if self._spec.enum_type is not None:
             try:
                 return self._spec.enum_type(value).name
