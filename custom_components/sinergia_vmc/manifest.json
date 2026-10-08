@@ -1,0 +1,19 @@
+{
+  "domain": "sinergia_vmc",
+  "name": "Sinergia VMC (Modbus)",
+  "codeowners": [
+    "@riccardorossi92"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "modbus"
+  ],
+  "documentation": "https://github.com/riccardorossi92/ha-sinergia-vmc",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/riccardorossi92/ha-sinergia-vmc/issues",
+  "requirements": [
+    "modbus-connection>=4.0.0"
+  ],
+  "version": "0.3.1"
+}

@@ -1,0 +1,50 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sinergia VMC (Modbus)",
+        "menu_options": {
+          "tcp": "Network gateway (RS485 to Ethernet, Modbus TCP)",
+          "serial": "Direct USB-RS485 adapter"
+        }
+      },
+      "tcp": {
+        "title": "TCP connection (RS485-Ethernet gateway)",
+        "description": "Enter the IP address and port of the RS485-Ethernet gateway (e.g. Waveshare RS485 TO ETH in \"Modbus TCP to RTU\" mode, usually port 502).",
+        "data": {
+          "host": "IP address or hostname",
+          "port": "TCP port",
+          "unit": "Modbus address (unit id)"
+        }
+      },
+      "serial": {
+        "title": "Serial connection (USB-RS485)",
+        "description": "Connect the USB-RS485 adapter to the VMC board and enter the connection parameters (factory defaults: 9600 baud, parity N, 1 stop bit, address 1).",
+        "data": {
+          "device": "Serial port",
+          "baudrate": "Baud rate",
+          "parity": "Parity",
+          "stopbits": "Stop bits",
+          "unit": "Modbus address (unit id)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the VMC board. Check the address/port (or the serial port and RS-485 wiring) and the communication parameters.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This VMC unit is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sinergia VMC options",
+        "data": {
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,377 @@
+"""Register map for Sinergia VMC units (CPRO3OEM-K electronics, HRD/HRD+).
+
+Source: "Manuale di collegamento e impostazioni MODBUS HRD/HRD+" (Sinergia,
+r.03_10-2023), cross-checked against a real RS-485 register scan.
+
+IMPORTANT addressing note: the manual's "Addr DEC" column is always
+Addr_HEX + 1 (except in the "COMANDI TEST" group, which is excluded here -
+its own table looks inconsistent with every other group and needs field
+verification before use). Every address below is the REAL address to call
+over Modbus (Addr_HEX / Addr_DEC - 1).
+
+IMPORTANT enable note: per the manual, H02/H27/H28 (see `Enables` below)
+MUST be set to 1 for the corresponding writes (on/off, integration,
+dehumidify) to have any effect at all. Without them the unit silently
+ignores the write - no error, nothing happens.
+"""
+
+from __future__ import annotations
+
+from enum import IntEnum
+
+from modbus_connection.model import Component, Device
+from modbus_connection.model.fields import boolean, enum, gauge, integer
+
+__all__ = [
+    "Alarms",
+    "Command",
+    "DigitalIO",
+    "Enables",
+    "FanSpeeds",
+    "Maintenance",
+    "Outputs",
+    "Probes",
+    "Setpoints",
+    "UnitStatusCode",
+    "Status",
+    "VmcDevice",
+]
+
+
+# --------------------------------------------------------------------------- #
+# Enums for the more useful status registers
+# --------------------------------------------------------------------------- #
+
+
+class UnitStatusCode(IntEnum):
+    OFF = 0
+    OFF_DI = 1
+    OFF_BMS = 2
+    OFF_SCHEDULER = 3
+    OFF_RTC = 4
+    ON = 5
+
+
+class ModeStatusCode(IntEnum):
+    SUMMER_MANUAL = 0
+    WINTER_MANUAL = 1
+    SUMMER_AUTO = 2
+    WINTER_AUTO = 3
+    SUMMER_DI = 4
+    WINTER_DI = 5
+
+
+class FanStatusCode(IntEnum):
+    DISABLE = 0
+    OFF = 1
+    WAIT_ON = 2
+    ON = 3
+    WAIT_OFF = 4
+    ALARM = 5
+
+
+class CompressorStatusCode(IntEnum):
+    DISABLE = 0
+    ALARM = 1
+    MANUAL = 2
+    WAIT_ON = 3
+    ON = 4
+    WAIT_OFF = 5
+    OFF = 6
+
+
+class DamperStatusCode(IntEnum):
+    DISABLE = 0
+    OFF = 1
+    WAIT_OFF = 2
+    ON = 3
+
+
+class RecircDamperStatusCode(IntEnum):
+    OFF = 0
+    ON = 1
+    DISABLE = 2
+
+
+# --------------------------------------------------------------------------- #
+# Read-only components
+# --------------------------------------------------------------------------- #
+
+
+class Probes(Component):
+    """Sonde di temperatura/umidità interne all'unità (R/O)."""
+
+    register_space = "holding"
+
+    temp_return_room = gauge(499, 0.1, unit="°C")
+    """Sonda temperatura ambiente/ripresa sul pannello a muro.
+    Non leggibile se il pannello remoto non è presente/abilitato."""
+
+    temp_outdoor = gauge(500, 0.1, unit="°C")
+    temp_water = gauge(501, 0.1, unit="°C")
+    temp_exhaust = gauge(502, 0.1, unit="°C")
+    temp_free_cooling = gauge(510, 0.1, unit="°C")
+
+    temp_evaporation = gauge(511, 0.1, unit="°C")
+    """Solo versione Inverter con compressore."""
+
+    humidity_return_room = integer(505, signed=False, unit="%")
+    """Sonda umidità ambiente/ripresa sul pannello a muro.
+    Non leggibile se il pannello remoto non è presente/abilitato."""
+
+
+class Outputs(Component):
+    """Uscite analogiche ventilatori/compressore/serranda, in % (R/O)."""
+
+    register_space = "holding"
+
+    supply_fan_pct = gauge(639, 0.01, signed=False, unit="%")
+    return_fan_pct = gauge(640, 0.01, signed=False, unit="%")
+
+    compressor_pct = gauge(641, 0.01, signed=False, unit="%")
+    """Solo versione Inverter."""
+
+    external_damper_pct = gauge(642, 0.01, signed=False, unit="%")
+
+
+class Alarms(Component):
+    """Allarmi: bitmask grezze + registro cumulativo (R/O)."""
+
+    register_space = "holding"
+
+    # bit00=AL01 ... bit15=AL16
+    packed_1 = integer(768, signed=False)
+    # bit00=AL17 ... bit15=AL32
+    packed_2 = integer(769, signed=False)
+    # bit00=AL33, bit01=AL34, bit02=AL35, bit03=riservato, bit04=AL37,
+    # bit05=AL38, bit06=AL39
+    packed_3 = integer(770, signed=False)
+
+    active = boolean(1103)
+    """Allarme cumulativo attivo (OR di tutti gli allarmi)."""
+
+
+class DigitalIO(Component):
+    """Ingressi/uscite digitali, come bitmask grezze (R/O)."""
+
+    register_space = "holding"
+
+    # bit0-1=Remote on/off, bit2-3=Summer/Winter, bit4-5=Dehum request,
+    # bit6-7=Thermo request
+    logic_di1 = integer(257, signed=False)
+
+    # bit0-1=Supply fan, bit2-3=Return fan, bit4-5=Compressor,
+    # bit6-7=External damper, bit8-9=Recirculation damper,
+    # bit10-11=Water flow valve, bit12-13=Water condensation valve,
+    # bit14-15=Air condensation valve
+    do1 = integer(384, signed=False)
+
+    # bit2-3=Bypass Free-Cooling, bit4-5=On/Off, bit6-7=Summer/Winter,
+    # bit8-9=Serious alarm, bit10-11=Light alarm, bit12-13=High humidity
+    do2 = integer(385, signed=False)
+
+
+class Status(Component):
+    """Stato dettagliato dell'unità al momento dell'interrogazione (R/O)."""
+
+    register_space = "holding"
+
+    unit_status = enum(1104, UnitStatusCode)
+    mode_status = enum(1110, ModeStatusCode)
+    actual_setpoint = gauge(1111, 0.1, unit="°C")
+
+    supply_fan_status = enum(1119, FanStatusCode)
+    return_fan_status = enum(1120, FanStatusCode)
+    dehum_request = boolean(1121)
+    compressor_status = enum(1122, CompressorStatusCode)
+
+    external_damper_modulating_pct = gauge(1127, 0.01, signed=False, unit="%")
+    external_damper_status = enum(1128, DamperStatusCode)
+
+    freecooling_heating_request = boolean(1132)
+    recirc_damper_status = enum(1134, RecircDamperStatusCode)
+
+
+class Maintenance(Component):
+    """Contatori ore di funzionamento (R/O; solo word bassa, valore x10)."""
+
+    register_space = "holding"
+
+    supply_fan_hours = gauge(1604, 0.1, signed=False, unit="h")
+    """Ore di funzionamento ventilatore mandata rispetto al limite impostato
+    in `Command.fans_hours_limit`. Nota: nel manuale questo registro ha
+    anche una word alta (32 bit complessivi); qui viene letta solo la word
+    bassa, sufficiente per contatori entro ~6553 ore."""
+
+
+# --------------------------------------------------------------------------- #
+# Writable components
+# --------------------------------------------------------------------------- #
+
+
+class Enables(Component):
+    """Flag di abilitazione OBBLIGATORI per il controllo via Modbus/BMS (R/W).
+
+    Dal manuale: "Parametri da impostare obbligatoriamente per rendere
+    funzionanti le impostazioni tramite MODBUS, se non viene fatto l'unità
+    non terrà conto dei registri chiamati."
+    """
+
+    register_space = "holding"
+
+    onoff_by_bms = boolean(1778, writable=True)
+    """H02 - deve essere True per poter controllare l'accensione/spegnimento
+    scrivendo su Command.onoff_by_supervisor."""
+
+    integ_by_bms = boolean(1869, writable=True)
+    """H27 - deve essere True per controllare l'integrazione di calore."""
+
+    dehum_by_bms = boolean(1870, writable=True)
+    """H28 - deve essere True per controllare la deumidifica."""
+
+    onoff_by_keyboard = boolean(1777, writable=True)
+    """H01 - abilita accensione/spegnimento da tastiera locale (default True,
+    di solito non serve toccarlo)."""
+
+
+class Command(Component):
+    """Comandi operativi e reset allarmi manuali (R/W)."""
+
+    register_space = "holding"
+
+    onoff_by_supervisor = boolean(1105, writable=True)
+    """Accende/spegne l'unità. Richiede Enables.onoff_by_bms = True."""
+
+    integ_request_by_bms = boolean(1140, writable=True)
+    """Richiesta integrazione di calore. Richiede Enables.integ_by_bms = True."""
+
+    dehum_request_by_bms = boolean(1141, writable=True)
+    """Richiesta deumidifica. Richiede Enables.dehum_by_bms = True."""
+
+    summer_winter_mode = boolean(1583, writable=True)
+    """MOdE - Modalità operativa: False=Estate, True=Inverno."""
+
+    priority_display_mode = boolean(1878, writable=True)
+    """C11 - Priorità cambio modalità: False=Display/BMS, True=DI (ingresso
+    digitale). Va impostato se il comando remoto (pannello) è presente e si
+    vuole gestire il cambio stagione da contatto digitale/supervisione."""
+
+    reset_alarm_al02 = boolean(780, writable=True)
+    """Reset manuale allarme AL02 (alta umidità) - scrittura a impulso."""
+
+    reset_alarm_al12 = boolean(786, writable=True)
+    """Reset manuale allarme AL12 (alta pressione compressore) - impulso."""
+
+    fans_hours_limit = gauge(1603, 0.1, signed=False, writable=True, unit="h")
+    """M00 - limite ore di lavoro ventilatori oltre il quale scatta
+    l'allarme filtri sporchi (default 200.0h, i.e. raw 2000)."""
+
+
+class Setpoints(Component):
+    """Setpoint di temperatura/umidità (R/W).
+
+    Utilizzabili solo in presenza del comando remoto, perché le sonde sono
+    al suo interno.
+    """
+
+    register_space = "holding"
+
+    summer = gauge(1584, 0.1, writable=True, unit="°C")
+    """SEtC - default 24.0°C, range -15.0..158.0."""
+
+    winter = gauge(1585, 0.1, writable=True, unit="°C")
+    """SEtH - default 20.0°C, range -15.0..158.0."""
+
+    humidity = integer(1586, signed=False, writable=True, unit="%")
+    """PU01 - default 55%, range 0..100."""
+
+    freecooling_heating = gauge(1703, 0.1, writable=True, unit="°C")
+    """S06 - default 4.0°C, range 0.0..68.0."""
+
+    freecooling_heating_diff = gauge(1704, 0.1, writable=True, unit="°C")
+    """S07 - default 2.0°C, range 0.0..36.0."""
+
+    high_humidity_warning = integer(1735, signed=False, writable=True, unit="%")
+    """A19 - default 100% (=disabilitato se non presente serranda aria
+    esterna), range 0..100."""
+
+    summer_commutation_water = gauge(1633, 0.1, writable=True, unit="°C")
+    """C07 - default 30.0°C, range 0.0..158.0."""
+
+    winter_commutation_water = gauge(1634, 0.1, writable=True, unit="°C")
+    """C08 - default 20.0°C, range 0.0..158.0."""
+
+    max_time_dehum_by_di_warning = integer(1877, signed=False, writable=True, unit="min")
+    """PA58 - default 0, range 0..999."""
+
+
+class FanSpeeds(Component):
+    """Velocità minime/massime ventilatori per modalità, in % (R/W).
+
+    ATTENZIONE dal manuale: i valori vanno scritti/letti con due decimali
+    (es. 40% <-> raw 4000): gestito automaticamente dallo scale=0.01 qui
+    sotto, quindi si legge/scrive direttamente in %.
+    """
+
+    register_space = "holding"
+
+    min_supply_vmc_mode = gauge(1644, 0.01, signed=False, writable=True, unit="%")
+    """F07 - default 30%, mandata in modalità VMC."""
+
+    max_supply_vmc_mode = gauge(1645, 0.01, signed=False, writable=True, unit="%")
+    """F08 - default 60%, mandata in modalità VMC."""
+
+    min_supply_integration = gauge(1852, 0.01, signed=False, writable=True, unit="%")
+    """F27 - default 50%, mandata in integrazione."""
+
+    max_supply_integration = gauge(1646, 0.01, signed=False, writable=True, unit="%")
+    """F09 - default 85%, mandata in integrazione."""
+
+    min_supply_dehum = gauge(1853, 0.01, signed=False, writable=True, unit="%")
+    """F28 - default 50%, mandata in deumidifica."""
+
+    max_supply_dehum = gauge(1647, 0.01, signed=False, writable=True, unit="%")
+    """F10 - default 85%, mandata in deumidifica."""
+
+    min_return = gauge(1854, 0.01, signed=False, writable=True, unit="%")
+    """F29 - default 40%, ripresa in qualsiasi modalità."""
+
+    max_return = gauge(1855, 0.01, signed=False, writable=True, unit="%")
+    """F30 - default 75%, ripresa in qualsiasi modalità."""
+
+
+# --------------------------------------------------------------------------- #
+# Device
+# --------------------------------------------------------------------------- #
+
+
+class VmcDevice(Device):
+    """Unità VMC Sinergia (elettronica CPRO3OEM-K, HRD/HRD+) su Modbus RTU."""
+
+    #: Nomi dei componenti, nell'ordine consigliato di lettura (usare con
+    #: ``device.async_poll(device.COMPONENT_NAMES)``).
+    COMPONENT_NAMES: tuple[str, ...] = (
+        "probes",
+        "outputs",
+        "alarms",
+        "digital_io",
+        "status",
+        "maintenance",
+        "enables",
+        "command",
+        "setpoints",
+        "fan_speeds",
+    )
+
+    def __init__(self, unit) -> None:  # noqa: ANN001 - ModbusUnit from modbus_connection
+        super().__init__(unit)
+        self.probes = Probes(unit)
+        self.outputs = Outputs(unit)
+        self.alarms = Alarms(unit)
+        self.digital_io = DigitalIO(unit)
+        self.status = Status(unit)
+        self.maintenance = Maintenance(unit)
+        self.enables = Enables(unit)
+        self.command = Command(unit)
+        self.setpoints = Setpoints(unit)
+        self.fan_speeds = FanSpeeds(unit)

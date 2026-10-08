@@ -1,0 +1,50 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sinergia VMC (Modbus)",
+        "menu_options": {
+          "tcp": "Gateway di rete (RS485 to Ethernet, Modbus TCP)",
+          "serial": "Adattatore USB-RS485 diretto"
+        }
+      },
+      "tcp": {
+        "title": "Connessione TCP (gateway RS485-Ethernet)",
+        "description": "Inserisci l'indirizzo IP e la porta del gateway RS485-Ethernet (es. Waveshare RS485 TO ETH in modalità \"Modbus TCP to RTU\", porta tipicamente 502).",
+        "data": {
+          "host": "Indirizzo IP o hostname",
+          "port": "Porta TCP",
+          "unit": "Indirizzo Modbus (unit id)"
+        }
+      },
+      "serial": {
+        "title": "Connessione seriale (USB-RS485)",
+        "description": "Collega l'adattatore USB-RS485 alla scheda VMC e inserisci i parametri di connessione (default di fabbrica: 9600 baud, parità N, 1 stop bit, indirizzo 1).",
+        "data": {
+          "device": "Porta seriale",
+          "baudrate": "Baud rate",
+          "parity": "Parità",
+          "stopbits": "Stop bit",
+          "unit": "Indirizzo Modbus (unit id)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi alla scheda VMC. Verifica indirizzo/porta (o porta seriale e cablaggio RS-485) e parametri di comunicazione.",
+      "unknown": "Errore imprevisto."
+    },
+    "abort": {
+      "already_configured": "Questa unità VMC è già configurata."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni Sinergia VMC",
+        "data": {
+          "scan_interval": "Intervallo di aggiornamento (secondi)"
+        }
+      }
+    }
+  }
+}
