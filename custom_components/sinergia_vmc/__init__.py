@@ -19,6 +19,8 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 from modbus_connection import ModbusSerialParams, ModbusTcpParams
 
 from .const import (
@@ -27,9 +29,11 @@ from .const import (
     CONF_STOPBITS,
     CONF_UNIT,
     DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
     TYPE_SERIAL,
 )
 from .coordinator import SinergiaVmcConfigEntry, VmcCoordinator
+from .services import async_setup_services
 
 PLATFORMS: list[Platform] = [
     Platform.BUTTON,
@@ -38,6 +42,15 @@ PLATFORMS: list[Platform] = [
     Platform.SWITCH,
     Platform.NUMBER,
 ]
+
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Registra le action, disponibili indipendentemente dalle entry."""
+    async_setup_services(hass)
+    return True
 
 
 def create_modbus_params(data: dict) -> ModbusSerialParams | ModbusTcpParams:

@@ -25,7 +25,27 @@ di Home Assistant.
 - **Number**: setpoint e velocità ventilatori
 - **Fasce orarie**: fascia attiva (Comfort/Economy/Night/OFF), abilitazione
   della programmazione, setpoint Comfort, offset Economy/Night e velocità
-  ventilatori per fascia, programma settimanale (sola lettura)
+  ventilatori per fascia, programma settimanale
+- **Action `sinergia_vmc.set_time_band`**: modifica orario di inizio e/o
+  modalità di una fascia (1-4) per uno o più giorni
+
+## Modificare le fasce orarie
+
+Esempio (Strumenti per sviluppatori → Azioni, modalità YAML): fascia Comfort
+dalle 09:30 dal lunedì al venerdì.
+
+```yaml
+action: sinergia_vmc.set_time_band
+data:
+  days: [mon, tue, wed, thu, fri]
+  band: 2
+  start: "09:30:00"
+  mode: comfort
+```
+
+Gli orari delle fasce attive di un giorno devono restare crescenti: se la
+modifica li renderebbe disordinati l'action viene rifiutata senza scrivere
+nulla. Per togliere una fascia usa `mode: disabled`.
 
 ## Installazione
 

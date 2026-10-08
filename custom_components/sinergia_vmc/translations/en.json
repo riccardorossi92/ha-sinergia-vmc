@@ -46,5 +46,55 @@
         }
       }
     }
+  },
+  "selector": {
+    "days": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    },
+    "mode": {
+      "options": {
+        "comfort": "Comfort",
+        "economy": "Economy",
+        "night": "Night",
+        "off": "OFF (unit off)",
+        "disabled": "Disabled"
+      }
+    }
+  },
+  "services": {
+    "set_time_band": {
+      "name": "Set time band",
+      "description": "Change the start time and/or mode of a time band in the VMC weekly schedule.",
+      "fields": {
+        "config_entry_id": {
+          "name": "VMC",
+          "description": "VMC unit to change (only needed if you have more than one)."
+        },
+        "days": {
+          "name": "Days",
+          "description": "Days of the week to apply the change to."
+        },
+        "band": {
+          "name": "Band",
+          "description": "Band number (1-4) within the day."
+        },
+        "start": {
+          "name": "Start",
+          "description": "Band start time. Start times of the active bands of a day must be increasing."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "Band mode (Comfort, Economy, Night, OFF or Disabled)."
+        }
+      }
+    }
   }
 }

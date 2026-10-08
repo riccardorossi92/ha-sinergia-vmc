@@ -408,7 +408,7 @@ def _time_band_fields() -> dict:
     dalla mezzanotte su 32 bit (word bassa, word alta).
     """
     fields: dict = {
-        "__doc__": "Programmazione a fasce orarie e vacanza (R/O).",
+        "__doc__": "Programmazione a fasce orarie e vacanza (R/W).",
         "register_space": "holding",
         "vacation_days": integer(1497, signed=False, unit="d"),
         "vacation_hours": integer(1498, signed=False, unit="h"),
@@ -416,24 +416,20 @@ def _time_band_fields() -> dict:
     for d, day in enumerate(TIME_BAND_DAYS):
         for b in range(TIME_BANDS_PER_DAY):
             addr = _TIME_BANDS_BASE + 12 * d + 3 * b
-            fields[f"{day}_{b + 1}_type"] = integer(addr, signed=False)
-            fields[f"{day}_{b + 1}_time_lo"] = integer(addr + 1, signed=False)
-            fields[f"{day}_{b + 1}_time_hi"] = integer(addr + 2, signed=False)
+            fields[f"{day}_{b + 1}_type"] = integer(addr, signed=False, writable=True)
+            fields[f"{day}_{b + 1}_start"] = uint32(
+                addr + 1, word_order="little", writable=True, unit="s"
+            )
     return fields
 
 
-# 84 campi generati: più leggibile che scriverli uno per uno.
+# 58 campi generati: più leggibile che scriverli uno per uno.
 TimeBands = type("TimeBands", (Component,), _time_band_fields())
 
 
 def time_band(bands: TimeBands, day: str, index: int) -> tuple[int | None, int | None]:
     """Ritorna (tipo, secondi dalla mezzanotte) della fascia `index` (1-4)."""
-    kind = getattr(bands, f"{day}_{index}_type")
-    lo = getattr(bands, f"{day}_{index}_time_lo")
-    hi = getattr(bands, f"{day}_{index}_time_hi")
-    if lo is None or hi is None:
-        return kind, None
-    return kind, (hi << 16) | lo
+    return getattr(bands, f"{day}_{index}_type"), getattr(bands, f"{day}_{index}_start")
 
 
 class TimeBandSetpoints(Component):

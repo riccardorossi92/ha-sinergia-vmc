@@ -1,0 +1,47 @@
+set_time_band:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: sinergia_vmc
+    days:
+      required: true
+      example: ["mon", "tue", "wed", "thu", "fri"]
+      selector:
+        select:
+          multiple: true
+          translation_key: days
+          options:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+    band:
+      required: true
+      example: 2
+      selector:
+        number:
+          min: 1
+          max: 4
+          mode: box
+    start:
+      required: false
+      example: "10:00:00"
+      selector:
+        time:
+    mode:
+      required: false
+      example: comfort
+      selector:
+        select:
+          translation_key: mode
+          options:
+            - comfort
+            - economy
+            - night
+            - "off"
+            - disabled

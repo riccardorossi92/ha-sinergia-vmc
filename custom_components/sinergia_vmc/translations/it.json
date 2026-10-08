@@ -46,5 +46,55 @@
         }
       }
     }
+  },
+  "selector": {
+    "days": {
+      "options": {
+        "mon": "Lunedì",
+        "tue": "Martedì",
+        "wed": "Mercoledì",
+        "thu": "Giovedì",
+        "fri": "Venerdì",
+        "sat": "Sabato",
+        "sun": "Domenica"
+      }
+    },
+    "mode": {
+      "options": {
+        "comfort": "Comfort",
+        "economy": "Economy",
+        "night": "Night",
+        "off": "OFF (unità spenta)",
+        "disabled": "Disabilitata"
+      }
+    }
+  },
+  "services": {
+    "set_time_band": {
+      "name": "Imposta fascia oraria",
+      "description": "Modifica orario di inizio e/o modalità di una fascia della programmazione settimanale della VMC.",
+      "fields": {
+        "config_entry_id": {
+          "name": "VMC",
+          "description": "Unità VMC da modificare (necessario solo se ne hai più di una)."
+        },
+        "days": {
+          "name": "Giorni",
+          "description": "Giorni della settimana a cui applicare la modifica."
+        },
+        "band": {
+          "name": "Fascia",
+          "description": "Numero della fascia (1-4) nel giorno."
+        },
+        "start": {
+          "name": "Inizio",
+          "description": "Orario di inizio della fascia. Gli orari delle fasce attive di un giorno devono essere crescenti."
+        },
+        "mode": {
+          "name": "Modalità",
+          "description": "Modalità della fascia (Comfort, Economy, Night, OFF o Disabilitata)."
+        }
+      }
+    }
   }
 }
