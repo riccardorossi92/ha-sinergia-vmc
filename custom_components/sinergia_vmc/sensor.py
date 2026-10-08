@@ -11,10 +11,17 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import SinergiaVmcConfigEntry
 from .entity import VmcEntity
+from .vmc_modbus_device.device import (
+    TIME_BAND_DAYS,
+    TIME_BANDS_PER_DAY,
+    TimeBandCode,
+    time_band,
+)
 
 # La scheda segnala una sonda assente/guasta con valori sentinella
 # 0x80xx (es. 0x8004 = -32764 -> -3276.4 °C dopo la scala 0.1).
@@ -33,6 +40,7 @@ class VmcSensorSpec:
     entity_category: str | None = None
     enum_valued: bool = False
     enabled_default: bool = True
+    enum_type: type[IntEnum] | None = None  # converte un intero grezzo in nome enum
 
 
 SENSORS: tuple[VmcSensorSpec, ...] = (
@@ -130,6 +138,11 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
         component="status", attr="recirc_damper_status", name="Stato Serranda Ricircolo",
         unique_id_suffix="recirc_damper_status", enum_valued=True,
     ),
+    # --- Fasce orarie ---
+    VmcSensorSpec(
+        component="status", attr="active_time_band", name="Fascia Oraria Attiva",
+        unique_id_suffix="active_time_band", enum_type=TimeBandCode,
+    ),
     # --- Manutenzione ---
     VmcSensorSpec(
         component="maintenance", attr="supply_fan_hours", name="Ore Ventilatore Mandata",
@@ -169,8 +182,6 @@ class VmcSensor(VmcEntity, SensorEntity):
         self._attr_state_class = spec.state_class
         self._attr_entity_registry_enabled_default = spec.enabled_default
         if spec.entity_category:
-            from homeassistant.helpers.entity import EntityCategory
-
             self._attr_entity_category = EntityCategory(spec.entity_category)
 
     @property
@@ -180,12 +191,70 @@ class VmcSensor(VmcEntity, SensorEntity):
             return None
         if self._spec.enum_valued and isinstance(value, IntEnum):
             return value.name
+        if self._spec.enum_type is not None:
+            try:
+                return self._spec.enum_type(value).name
+            except ValueError:
+                return None
         if (
             self._spec.device_class == SensorDeviceClass.TEMPERATURE
             and value <= PROBE_ERROR_THRESHOLD
         ):
             return None
         return value
+
+
+DAY_NAMES = {
+    "mon": "Lunedì", "tue": "Martedì", "wed": "Mercoledì", "thu": "Giovedì",
+    "fri": "Venerdì", "sat": "Sabato", "sun": "Domenica",
+}
+BAND_NAMES = {
+    TimeBandCode.OFF: "OFF", TimeBandCode.COMFORT: "Comfort",
+    TimeBandCode.ECONOMY: "Economy", TimeBandCode.NIGHT: "Night",
+}
+
+
+class VmcScheduleDaySensor(VmcEntity, SensorEntity):
+    """Programma a fasce di un giorno, es. "07:00 Economy, 10:00 Comfort"."""
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:calendar-clock"
+
+    def __init__(self, coordinator, day: str) -> None:
+        super().__init__(
+            coordinator,
+            "time_bands",
+            f"{day}_1_type",
+            name=f"Programma {DAY_NAMES[day]}",
+            unique_id_suffix=f"schedule_{day}",
+        )
+        self._day = day
+
+    def _bands(self) -> list[tuple[str, str]] | None:
+        bands = []
+        for index in range(1, TIME_BANDS_PER_DAY + 1):
+            kind, seconds = time_band(self._component, self._day, index)
+            if kind is None or seconds is None:
+                return None
+            if kind == TimeBandCode.DISABLED or kind not in BAND_NAMES:
+                continue
+            start = f"{seconds // 3600:02d}:{seconds % 3600 // 60:02d}"
+            bands.append((start, BAND_NAMES[TimeBandCode(kind)]))
+        return bands
+
+    @property
+    def native_value(self) -> str | None:
+        bands = self._bands()
+        if bands is None:
+            return None
+        return ", ".join(f"{start} {name}" for start, name in bands) or "Nessuna fascia"
+
+    @property
+    def extra_state_attributes(self) -> dict | None:
+        bands = self._bands()
+        if bands is None:
+            return None
+        return {"fasce": [{"inizio": start, "fascia": name} for start, name in bands]}
 
 
 async def async_setup_entry(
@@ -195,3 +264,4 @@ async def async_setup_entry(
 ) -> None:
     coordinator = entry.runtime_data
     async_add_entities(VmcSensor(coordinator, spec) for spec in SENSORS)
+    async_add_entities(VmcScheduleDaySensor(coordinator, day) for day in TIME_BAND_DAYS)

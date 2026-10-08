@@ -23,6 +23,9 @@ di Home Assistant.
 - **Sensori binari**: allarmi e ingressi/uscite digitali
 - **Switch**: accensione, modalità estate/inverno, abilitazioni BMS
 - **Number**: setpoint e velocità ventilatori
+- **Fasce orarie**: fascia attiva (Comfort/Economy/Night/OFF), abilitazione
+  della programmazione, setpoint Comfort, offset Economy/Night e velocità
+  ventilatori per fascia, programma settimanale (sola lettura)
 
 ## Installazione
 
@@ -72,6 +75,12 @@ registro, ma `Addr DEC = Addr HEX convertito + 1` in tutti i gruppi tranne
 "COMANDI TEST" (dove sembrano coincidere, probabile refuso). Gli indirizzi
 usati qui sono quelli reali da chiamare via Modbus (`Addr HEX` / `Addr DEC - 1`),
 verificati incrociando 12+ registri con una scansione RS-485 reale della stessa VMC.
+
+**Fasce orarie.** I registri della programmazione a fasce non sono documentati
+da Sinergia: sono stati ricavati incrociando una scansione completa dei
+registri con il manuale EVCO *c-pro 3 OEM DE* (l'ordine dei parametri coincide
+con quello dei registri). La scansione si può rifare con
+[`tools/modbus_scan.py`](tools/modbus_scan.py) (gateway Modbus TCP, sola lettura).
 
 Registri volutamente esclusi (da aggiungere dopo verifica sul campo):
 gruppo "COMANDI TEST" (PT01-PT11) e word alte a 32 bit dei contatori ore filtri.

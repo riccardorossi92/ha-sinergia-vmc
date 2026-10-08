@@ -11,3 +11,7 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# scansioni Modbus locali
+scan_*.csv
+modbus_scan.csv

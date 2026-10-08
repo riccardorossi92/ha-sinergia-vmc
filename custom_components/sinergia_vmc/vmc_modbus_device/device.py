@@ -24,6 +24,9 @@ from modbus_connection.model.fields import boolean, enum, gauge, integer
 
 __all__ = [
     "Alarms",
+    "TimeBandCode",
+    "TimeBandSetpoints",
+    "TimeBands",
     "Command",
     "DigitalIO",
     "Enables",
@@ -85,6 +88,16 @@ class DamperStatusCode(IntEnum):
     OFF = 1
     WAIT_OFF = 2
     ON = 3
+
+
+class TimeBandCode(IntEnum):
+    """Tipo di fascia oraria (EVCO c-pro 3 OEM, menù "tb")."""
+
+    DISABLED = 0
+    OFF = 1
+    COMFORT = 2
+    ECONOMY = 3
+    NIGHT = 4
 
 
 class RecircDamperStatusCode(IntEnum):
@@ -191,6 +204,11 @@ class Status(Component):
     freecooling_heating_request = boolean(1132)
     recirc_damper_status = enum(1134, RecircDamperStatusCode)
 
+    active_time_band = integer(1106, signed=False)
+    """Fascia oraria attiva (valori di `TimeBandCode`). NON documentato da
+    Sinergia: dedotto da scansione (vale 2=Comfort durante la fascia Comfort),
+    da confermare a un cambio di fascia."""
+
 
 class Maintenance(Component):
     """Contatori ore di funzionamento (R/O; solo word bassa, valore x10)."""
@@ -228,6 +246,11 @@ class Enables(Component):
 
     dehum_by_bms = boolean(1870, writable=True)
     """H28 - deve essere True per controllare la deumidifica."""
+
+    time_bands_enabled = boolean(1779, writable=True)
+    """PH03 - abilita la regolazione a fasce orarie. NON documentato da
+    Sinergia: dedotto da scansione + manuale EVCO (segue H01/H02 nel menù
+    "Varie", e i registri successivi coincidono con PH04-PH10)."""
 
     onoff_by_keyboard = boolean(1777, writable=True)
     """H01 - abilita accensione/spegnimento da tastiera locale (default True,
@@ -341,6 +364,97 @@ class FanSpeeds(Component):
 
 
 # --------------------------------------------------------------------------- #
+# Fasce orarie (NON documentate da Sinergia)
+#
+# Ricavate incrociando una scansione completa dei registri con il manuale
+# EVCO "c-pro 3 OEM DE - Manuale applicativo" (144CP3ODI104): l'ordine dei
+# parametri nelle tabelle EVCO coincide con quello dei registri.
+# --------------------------------------------------------------------------- #
+
+TIME_BAND_DAYS: tuple[str, ...] = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+TIME_BANDS_PER_DAY = 4
+_TIME_BANDS_BASE = 1499
+
+
+def _time_band_fields() -> dict:
+    """Tabella fasce: 7 giorni x 4 fasce, 3 registri per fascia.
+
+    Per ogni fascia: tipo (`TimeBandCode`), poi orario di inizio in secondi
+    dalla mezzanotte su 32 bit (word bassa, word alta).
+    """
+    fields: dict = {
+        "__doc__": "Programmazione a fasce orarie e vacanza (R/O).",
+        "register_space": "holding",
+        "vacation_days": integer(1497, signed=False, unit="d"),
+        "vacation_hours": integer(1498, signed=False, unit="h"),
+    }
+    for d, day in enumerate(TIME_BAND_DAYS):
+        for b in range(TIME_BANDS_PER_DAY):
+            addr = _TIME_BANDS_BASE + 12 * d + 3 * b
+            fields[f"{day}_{b + 1}_type"] = integer(addr, signed=False)
+            fields[f"{day}_{b + 1}_time_lo"] = integer(addr + 1, signed=False)
+            fields[f"{day}_{b + 1}_time_hi"] = integer(addr + 2, signed=False)
+    return fields
+
+
+# 84 campi generati: più leggibile che scriverli uno per uno.
+TimeBands = type("TimeBands", (Component,), _time_band_fields())
+
+
+def time_band(bands: TimeBands, day: str, index: int) -> tuple[int | None, int | None]:
+    """Ritorna (tipo, secondi dalla mezzanotte) della fascia `index` (1-4)."""
+    kind = getattr(bands, f"{day}_{index}_type")
+    lo = getattr(bands, f"{day}_{index}_time_lo")
+    hi = getattr(bands, f"{day}_{index}_time_hi")
+    if lo is None or hi is None:
+        return kind, None
+    return kind, (hi << 16) | lo
+
+
+class TimeBandSetpoints(Component):
+    """Setpoint e velocità ventilatori per fascia oraria (R/W)."""
+
+    register_space = "holding"
+
+    comfort_summer = gauge(1587, 0.1, writable=True, unit="°C")
+    """SCC - setpoint freddo fascia comfort (default EVCO 24.0)."""
+
+    comfort_winter = gauge(1588, 0.1, writable=True, unit="°C")
+    """SCH - setpoint caldo fascia comfort (default EVCO 21.0)."""
+
+    economy_offset_summer = gauge(1589, 0.1, writable=True, unit="°C")
+    """OEC - offset freddo fascia economy (default +1.0)."""
+
+    economy_offset_winter = gauge(1590, 0.1, writable=True, unit="°C")
+    """OEH - offset caldo fascia economy (default -1.0)."""
+
+    night_offset_summer = gauge(1591, 0.1, writable=True, unit="°C")
+    """ONC - offset freddo fascia night (default +2.0)."""
+
+    night_offset_winter = gauge(1592, 0.1, writable=True, unit="°C")
+    """ONH - offset caldo fascia night (default -2.0)."""
+
+    supply_fan_comfort = gauge(1595, 0.01, signed=False, writable=True, unit="%")
+    """FSC - velocità ventilatore mandata fascia comfort."""
+
+    supply_fan_economy = gauge(1596, 0.01, signed=False, writable=True, unit="%")
+    """FSE - velocità ventilatore mandata fascia economy."""
+
+    supply_fan_night = gauge(1597, 0.01, signed=False, writable=True, unit="%")
+    """FSN - velocità ventilatore mandata fascia night."""
+
+    return_fan_comfort = gauge(1859, 0.01, signed=False, writable=True, unit="%")
+    """FRC - velocità ventilatore ripresa fascia comfort (meno certo dei
+    precedenti: non contiguo a FSC/FSE/FSN, dedotto dai valori)."""
+
+    return_fan_economy = gauge(1860, 0.01, signed=False, writable=True, unit="%")
+    """FRE - velocità ventilatore ripresa fascia economy (vedi FRC)."""
+
+    return_fan_night = gauge(1861, 0.01, signed=False, writable=True, unit="%")
+    """FRN - velocità ventilatore ripresa fascia night (vedi FRC)."""
+
+
+# --------------------------------------------------------------------------- #
 # Device
 # --------------------------------------------------------------------------- #
 
@@ -361,6 +475,8 @@ class VmcDevice(Device):
         "command",
         "setpoints",
         "fan_speeds",
+        "time_bands",
+        "time_band_setpoints",
     )
 
     def __init__(self, unit) -> None:  # noqa: ANN001 - ModbusUnit from modbus_connection
@@ -375,3 +491,5 @@ class VmcDevice(Device):
         self.command = Command(unit)
         self.setpoints = Setpoints(unit)
         self.fan_speeds = FanSpeeds(unit)
+        self.time_bands = TimeBands(unit)
+        self.time_band_setpoints = TimeBandSetpoints(unit)

@@ -46,6 +46,11 @@ SWITCHES: tuple[VmcSwitchSpec, ...] = (
         name="Abilita On/Off da Tastiera Locale (H01)",
         unique_id_suffix="enable_onoff_by_keyboard", diagnostic=True,
     ),
+    VmcSwitchSpec(
+        component="enables", attr="time_bands_enabled",
+        name="Fasce Orarie Abilitate (PH03)",
+        unique_id_suffix="enable_time_bands",
+    ),
     # Comandi
     VmcSwitchSpec(
         component="command", attr="onoff_by_supervisor",

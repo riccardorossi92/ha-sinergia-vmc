@@ -127,6 +127,79 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         unique_id_suffix="fan_max_return", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
     ),
+    # --- Fasce orarie ---
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="comfort_summer",
+        name="Setpoint Estivo Comfort (SCC)",
+        unique_id_suffix="tb_comfort_summer", unit="°C",
+        min_value=-15, max_value=158, step=0.5, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="comfort_winter",
+        name="Setpoint Invernale Comfort (SCH)",
+        unique_id_suffix="tb_comfort_winter", unit="°C",
+        min_value=-15, max_value=158, step=0.5, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="economy_offset_summer",
+        name="Offset Estivo Economy (OEC)",
+        unique_id_suffix="tb_economy_offset_summer", unit="°C",
+        min_value=-20, max_value=20, step=0.5, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="economy_offset_winter",
+        name="Offset Invernale Economy (OEH)",
+        unique_id_suffix="tb_economy_offset_winter", unit="°C",
+        min_value=-20, max_value=20, step=0.5, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="night_offset_summer",
+        name="Offset Estivo Night (ONC)",
+        unique_id_suffix="tb_night_offset_summer", unit="°C",
+        min_value=-20, max_value=20, step=0.5, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="night_offset_winter",
+        name="Offset Invernale Night (ONH)",
+        unique_id_suffix="tb_night_offset_winter", unit="°C",
+        min_value=-20, max_value=20, step=0.5, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="supply_fan_comfort",
+        name="Velocità Mandata Comfort (FSC)",
+        unique_id_suffix="tb_supply_fan_comfort", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="supply_fan_economy",
+        name="Velocità Mandata Economy (FSE)",
+        unique_id_suffix="tb_supply_fan_economy", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="supply_fan_night",
+        name="Velocità Mandata Night (FSN)",
+        unique_id_suffix="tb_supply_fan_night", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="return_fan_comfort",
+        name="Velocità Ripresa Comfort (FRC)",
+        unique_id_suffix="tb_return_fan_comfort", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="return_fan_economy",
+        name="Velocità Ripresa Economy (FRE)",
+        unique_id_suffix="tb_return_fan_economy", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="time_band_setpoints", attr="return_fan_night",
+        name="Velocità Ripresa Night (FRN)",
+        unique_id_suffix="tb_return_fan_night", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
     # --- Manutenzione ---
     VmcNumberSpec(
         component="command", attr="fans_hours_limit",

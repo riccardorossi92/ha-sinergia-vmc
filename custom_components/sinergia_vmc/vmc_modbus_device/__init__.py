@@ -16,6 +16,9 @@ from .device import (
     RecircDamperStatusCode,
     Setpoints,
     Status,
+    TimeBandCode,
+    TimeBandSetpoints,
+    TimeBands,
     UnitStatusCode,
     VmcDevice,
 )
@@ -36,6 +39,9 @@ __all__ = [
     "RecircDamperStatusCode",
     "Setpoints",
     "Status",
+    "TimeBandCode",
+    "TimeBandSetpoints",
+    "TimeBands",
     "UnitStatusCode",
     "VmcDevice",
 ]
