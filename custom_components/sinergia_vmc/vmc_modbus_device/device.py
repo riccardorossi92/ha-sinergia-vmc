@@ -204,9 +204,10 @@ class Status(Component):
     freecooling_heating_request = boolean(1132)
     recirc_damper_status = enum(1134, RecircDamperStatusCode)
 
-    board_clock = uint32(1101, word_order="little")
+    board_clock = uint32(1101, word_order="little", writable=True)
     """Orologio (RTC) della scheda, in secondi dal 2000-01-01, ora locale.
-    NON documentato da Sinergia: dedotto da scansione."""
+    NON documentato da Sinergia: dedotto da scansione. Scrivibile (da
+    verificare sul campo): usato per sincronizzarlo con Home Assistant."""
 
     active_time_band = integer(1106, signed=False)
     """Fascia oraria attiva (valori di `TimeBandCode`). NON documentato da
