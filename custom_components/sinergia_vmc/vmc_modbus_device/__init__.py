@@ -1,6 +1,8 @@
 """Device library for Sinergia VMC units (CPRO3OEM-K electronics) over Modbus RTU."""
 
 from .device import (
+    TIME_BAND_DAYS,
+    TIME_BANDS_PER_DAY,
     Alarms,
     Command,
     CompressorStatusCode,
@@ -21,9 +23,12 @@ from .device import (
     TimeBands,
     UnitStatusCode,
     VmcDevice,
+    time_band,
 )
 
 __all__ = [
+    "TIME_BANDS_PER_DAY",
+    "TIME_BAND_DAYS",
     "Alarms",
     "Command",
     "CompressorStatusCode",
@@ -44,6 +49,7 @@ __all__ = [
     "TimeBands",
     "UnitStatusCode",
     "VmcDevice",
+    "time_band",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

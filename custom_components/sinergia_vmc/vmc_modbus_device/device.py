@@ -1,7 +1,10 @@
 """Register map for Sinergia VMC units (CPRO3OEM-K electronics, HRD/HRD+).
 
 Source: "Manuale di collegamento e impostazioni MODBUS HRD/HRD+" (Sinergia,
-r.03_10-2023), cross-checked against a real RS-485 register scan.
+r.03_10-2023 / r.05), cross-checked against a real RS-485 register scan.
+Time bands, hour counters and the board clock are NOT documented by Sinergia:
+they were deduced from a full register scan matched against the EVCO
+"c-pro 3 OEM DE" application manual (144CP3ODI104).
 
 IMPORTANT addressing note: the manual's "Addr DEC" column is always
 Addr_HEX + 1 (except in the "COMANDI TEST" group, which is excluded here -
