@@ -48,6 +48,7 @@ class VmcSensorSpec:
     enabled_default: bool = True
     enum_type: type[IntEnum] | None = None  # converte un intero grezzo in nome enum
     board_datetime: bool = False  # secondi dal 2000-01-01 -> timestamp
+    board_clock_offset: bool = False  # secondi dal 2000-01-01 -> scarto in minuti da HA
 
 
 SENSORS: tuple[VmcSensorSpec, ...] = (
@@ -174,10 +175,13 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
         unique_id_suffix="last_maintenance", board_datetime=True,
         device_class=SensorDeviceClass.TIMESTAMP, entity_category="diagnostic",
     ),
+    # Scarto e non l'ora: un timestamp cambierebbe a ogni lettura riempiendo
+    # lo storico, lo scarto resta stabile (di solito 0).
     VmcSensorSpec(
-        component="status", attr="board_clock", name="Orologio Scheda",
-        unique_id_suffix="board_clock", board_datetime=True,
-        device_class=SensorDeviceClass.TIMESTAMP, entity_category="diagnostic",
+        component="status", attr="board_clock", name="Scarto Orologio Scheda",
+        unique_id_suffix="board_clock_offset", board_clock_offset=True, unit="min",
+        device_class=SensorDeviceClass.DURATION, state_class=SensorStateClass.MEASUREMENT,
+        entity_category="diagnostic",
     ),
     # --- Allarmi (bitmask grezze, utili per template/diagnostica) ---
     VmcSensorSpec(
@@ -221,6 +225,10 @@ class VmcSensor(VmcEntity, SensorEntity):
             return None
         if self._spec.enum_valued and isinstance(value, IntEnum):
             return value.name
+        if self._spec.board_clock_offset:
+            board = BOARD_EPOCH + timedelta(seconds=value)
+            now = dt_util.now().replace(tzinfo=None)
+            return round((board - now).total_seconds() / 60)
         if self._spec.board_datetime:
             return (BOARD_EPOCH + timedelta(seconds=value)).replace(
                 tzinfo=dt_util.get_default_time_zone()
