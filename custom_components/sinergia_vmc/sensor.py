@@ -106,6 +106,7 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
     VmcSensorSpec(
         component="outputs", attr="external_damper_pct", name="Serranda Esterna %",
         unique_id_suffix="external_damper_pct", unit="%", state_class=SensorStateClass.MEASUREMENT,
+        enabled_default=False,
     ),
     # --- Stato unità ---
     VmcSensorSpec(
@@ -137,6 +138,7 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
         component="status", attr="external_damper_modulating_pct",
         name="Serranda Esterna Modulante %",
         unique_id_suffix="external_damper_modulating_pct", unit="%",
+        enabled_default=False,
     ),
     VmcSensorSpec(
         component="status", attr="external_damper_status", name="Stato Serranda Esterna",
@@ -157,18 +159,21 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
         unique_id_suffix="supply_fan_hours", unit="h",
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        enabled_default=False,
     ),
     VmcSensorSpec(
         component="maintenance", attr="return_fan_hours", name="Ore Ventilatore Ripresa",
         unique_id_suffix="return_fan_hours", unit="h",
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        enabled_default=False,
     ),
     VmcSensorSpec(
         component="maintenance", attr="compressor_hours", name="Ore Compressore",
         unique_id_suffix="compressor_hours", unit="h",
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
+        enabled_default=False,
     ),
     VmcSensorSpec(
         component="maintenance", attr="last_maintenance", name="Ultima Manutenzione",

@@ -20,6 +20,7 @@ class VmcSwitchSpec:
     name: str
     unique_id_suffix: str
     diagnostic: bool = False
+    enabled_default: bool = True
     momentary: bool = False  # scrive True e poi si "riporta" da solo sul device
 
 
@@ -72,6 +73,7 @@ SWITCHES: tuple[VmcSwitchSpec, ...] = (
         component="command", attr="priority_display_mode",
         name="Priorità Cambio Modalità a Ingresso Digitale (C11)",
         unique_id_suffix="priority_display_mode", diagnostic=True,
+        enabled_default=False,
     ),
     VmcSwitchSpec(
         component="command", attr="reset_alarm_al02",
@@ -98,6 +100,7 @@ class VmcSwitch(VmcEntity, SwitchEntity):
             unique_id_suffix=spec.unique_id_suffix,
         )
         self._spec = spec
+        self._attr_entity_registry_enabled_default = spec.enabled_default
         if spec.diagnostic:
             self._attr_entity_category = EntityCategory.CONFIG
 

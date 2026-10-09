@@ -24,6 +24,7 @@ class VmcNumberSpec:
     max_value: float
     step: float
     diagnostic: bool = False
+    enabled_default: bool = True
 
 
 NUMBERS: tuple[VmcNumberSpec, ...] = (
@@ -65,18 +66,21 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         name="Commutazione Estate Temp. Acqua (C07)",
         unique_id_suffix="setpoint_summer_commutation_water", unit="°C",
         min_value=0, max_value=158, step=0.5, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="setpoints", attr="winter_commutation_water",
         name="Commutazione Inverno Temp. Acqua (C08)",
         unique_id_suffix="setpoint_winter_commutation_water", unit="°C",
         min_value=0, max_value=158, step=0.5, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="setpoints", attr="max_time_dehum_by_di_warning",
         name="PA58 - Tempo Max Deumidifica da DI (warning)",
         unique_id_suffix="pa58_max_time_dehum", unit="min",
         min_value=0, max_value=999, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     # --- Velocità ventilatori ---
     VmcNumberSpec(
@@ -84,48 +88,56 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         name="Velocità Min. Mandata - Modo VMC (F07)",
         unique_id_suffix="fan_min_supply_vmc", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="max_supply_vmc_mode",
         name="Velocità Max. Mandata - Modo VMC (F08)",
         unique_id_suffix="fan_max_supply_vmc", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="min_supply_integration",
         name="Velocità Min. Mandata - Integrazione (F27)",
         unique_id_suffix="fan_min_supply_integ", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="max_supply_integration",
         name="Velocità Max. Mandata - Integrazione (F09)",
         unique_id_suffix="fan_max_supply_integ", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="min_supply_dehum",
         name="Velocità Min. Mandata - Deumidifica (F28)",
         unique_id_suffix="fan_min_supply_dehum", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="max_supply_dehum",
         name="Velocità Max. Mandata - Deumidifica (F10)",
         unique_id_suffix="fan_max_supply_dehum", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="min_return",
         name="Velocità Min. Ripresa (F29)",
         unique_id_suffix="fan_min_return", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="max_return",
         name="Velocità Max. Ripresa (F30)",
         unique_id_suffix="fan_max_return", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        enabled_default=False,
     ),
     # --- Fasce orarie ---
     VmcNumberSpec(
@@ -224,12 +236,14 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         name="Calibrazione Temperatura Acqua (M82)",
         unique_id_suffix="cal_water_temperature", unit="°C",
         min_value=-10, max_value=10, step=0.1, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="calibrations", attr="exhaust_temperature",
         name="Calibrazione Temperatura Espulsione (M83)",
         unique_id_suffix="cal_exhaust_temperature", unit="°C",
         min_value=-10, max_value=10, step=0.1, diagnostic=True,
+        enabled_default=False,
     ),
     # --- Manutenzione ---
     VmcNumberSpec(
@@ -237,12 +251,14 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         name="Limite Ore Ventilatori (M00, allarme filtri)",
         unique_id_suffix="fans_hours_limit", unit="h",
         min_value=0, max_value=99990, step=10, diagnostic=True,
+        enabled_default=False,
     ),
     VmcNumberSpec(
         component="maintenance", attr="compressor_hours_limit",
         name="Limite Ore Compressore (M03)",
         unique_id_suffix="compressor_hours_limit", unit="h",
         min_value=0, max_value=99990, step=10, diagnostic=True,
+        enabled_default=False,
     ),
 )
 
@@ -264,6 +280,7 @@ class VmcNumber(VmcEntity, NumberEntity):
         self._attr_native_min_value = spec.min_value
         self._attr_native_max_value = spec.max_value
         self._attr_native_step = spec.step
+        self._attr_entity_registry_enabled_default = spec.enabled_default
         if spec.diagnostic:
             self._attr_entity_category = EntityCategory.CONFIG
 
