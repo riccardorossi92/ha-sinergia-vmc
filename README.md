@@ -8,10 +8,12 @@ elettronica **CPRO3OEM-K** (HRD/HRD+), controllate via **Modbus RTU** su
 RS-485 — tramite adattatore USB-RS485 diretto oppure gateway RS485↔Ethernet
 (Modbus TCP).
 
-Testata su un'unità **HRD H** (versione D, compressore on/off) con elettronica
-**CPRO3OEM-K**, commercializzata come Sinergia / innova. La gamma HRD H esiste
-nelle taglie 30/15 e 50/25 e nelle versioni D (deumidifica isotermica) e DC
-(integrazione caldo/freddo, compressore inverter).
+Testata su un'unità **HRD 30/15 H K DC** (taglia 30/15, orizzontale, elettronica
+**CPRO3OEM-K**, versione DC deumidifica + integrazione caldo/freddo con
+compressore on/off R134A), prodotta da Sinergia e commercializzata come
+Termomarket / innova. Attenzione: nelle unità più recenti (manuale innova 2026)
+la versione DC ha invece compressore inverter, con sonda di evaporazione e
+uscita compressore modulante (registri 511 e 641), assenti sulla versione on/off.
 
 Usa la connessione Modbus condivisa fornita dall'integrazione core `modbus`
 di Home Assistant.
