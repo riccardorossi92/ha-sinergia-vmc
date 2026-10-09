@@ -24,6 +24,7 @@ from .device import (
     TimeBands,
     UnitStatusCode,
     VmcDevice,
+    async_write_time_band_start,
     time_band,
 )
 
@@ -51,6 +52,7 @@ __all__ = [
     "TimeBands",
     "UnitStatusCode",
     "VmcDevice",
+    "async_write_time_band_start",
     "time_band",
 ]
 

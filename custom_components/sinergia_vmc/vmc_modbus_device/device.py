@@ -433,6 +433,30 @@ def time_band(bands: TimeBands, day: str, index: int) -> tuple[int | None, int |
     return getattr(bands, f"{day}_{index}_type"), getattr(bands, f"{day}_{index}_start")
 
 
+async def async_write_time_band_start(
+    bands: TimeBands, day: str, index: int, seconds: int
+) -> None:
+    """Scrive l'orario di inizio di una fascia, una word alla volta.
+
+    La scheda applica le due word separatamente e satura a 23:59:59 ogni
+    valore intermedio oltre le 24 ore: scrivendo 18:00 (hi=0) sopra 20:00
+    (hi=1) con la word bassa per prima, il valore intermedio hi=1/lo=64800
+    diventa 23:59:59 e il risultato finale è 05:47:43. Si scrive quindi per
+    prima la word alta quando scende e la word bassa quando sale, così ogni
+    valore intermedio resta valido.
+    """
+    address = _TIME_BANDS_BASE + 12 * TIME_BAND_DAYS.index(day) + 3 * (index - 1) + 1
+    old = getattr(bands, f"{day}_{index}_start") or 0
+    lo, hi = seconds & 0xFFFF, seconds >> 16
+    unit = bands.modbus_unit
+    if hi < old >> 16:
+        await unit.write_register(address + 1, hi)
+        await unit.write_register(address, lo)
+    else:
+        await unit.write_register(address, lo)
+        await unit.write_register(address + 1, hi)
+
+
 class Calibrations(Component):
     """Calibrazione (offset) delle sonde, EVCO PM80-PM86 (R/W).
 

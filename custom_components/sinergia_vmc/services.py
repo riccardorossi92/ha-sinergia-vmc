@@ -15,6 +15,7 @@ from .vmc_modbus_device.device import (
     TIME_BAND_DAYS,
     TIME_BANDS_PER_DAY,
     TimeBandCode,
+    async_write_time_band_start,
     time_band,
 )
 
@@ -102,7 +103,7 @@ async def _async_set_time_band(hass: HomeAssistant, call: ServiceCall) -> None:
         if new_mode is not None:
             await bands.write(f"{day}_{index}_type", int(new_mode))
         if new_start is not None:
-            await bands.write(f"{day}_{index}_start", new_start)
+            await async_write_time_band_start(bands, day, index, new_start)
 
     await coordinator.async_request_refresh()
 
