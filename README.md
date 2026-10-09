@@ -28,6 +28,8 @@ di Home Assistant.
 - **Fasce orarie**: fascia attiva (Comfort/Economy/Night/OFF), abilitazione
   della programmazione, setpoint Comfort, offset Economy/Night e velocità
   ventilatori per fascia, programma settimanale
+- **Calibrazione sonde**: offset di temperatura ambiente (M80), umidità
+  ambiente (M86), temperatura esterna/acqua/espulsione (M81-M83)
 - **Action `sinergia_vmc.set_time_band`**: modifica orario di inizio e/o
   modalità di una fascia (1-4) per uno o più giorni
 
@@ -124,6 +126,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ⏳ da verificare |
 | 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ⏳ da verificare |
 | 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ⏳ da verificare (dedotti dai valori) | ⏳ da verificare |
+| 1616-1619, 1622 | Calibrazione sonde (M80-M83, M86) | ✅ verificato modificando M80/M86 dal pannello | ⏳ da verificare |
 | 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
 | 1602-1613 | Contatori ore, limiti, ultima manutenzione | ✅ valori plausibili | ⏳ da verificare (limiti) |
 

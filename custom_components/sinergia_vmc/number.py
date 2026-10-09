@@ -200,6 +200,37 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         unique_id_suffix="tb_return_fan_night", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
     ),
+    # --- Calibrazione sonde ---
+    VmcNumberSpec(
+        component="calibrations", attr="room_temperature",
+        name="Calibrazione Temperatura Ambiente (M80)",
+        unique_id_suffix="cal_room_temperature", unit="°C",
+        min_value=-10, max_value=10, step=0.1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="calibrations", attr="room_humidity",
+        name="Calibrazione Umidità Ambiente (M86)",
+        unique_id_suffix="cal_room_humidity", unit="%",
+        min_value=-10, max_value=10, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="calibrations", attr="outdoor_temperature",
+        name="Calibrazione Temperatura Esterna (M81)",
+        unique_id_suffix="cal_outdoor_temperature", unit="°C",
+        min_value=-10, max_value=10, step=0.1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="calibrations", attr="water_temperature",
+        name="Calibrazione Temperatura Acqua (M82)",
+        unique_id_suffix="cal_water_temperature", unit="°C",
+        min_value=-10, max_value=10, step=0.1, diagnostic=True,
+    ),
+    VmcNumberSpec(
+        component="calibrations", attr="exhaust_temperature",
+        name="Calibrazione Temperatura Espulsione (M83)",
+        unique_id_suffix="cal_exhaust_temperature", unit="°C",
+        min_value=-10, max_value=10, step=0.1, diagnostic=True,
+    ),
     # --- Manutenzione ---
     VmcNumberSpec(
         component="command", attr="fans_hours_limit",

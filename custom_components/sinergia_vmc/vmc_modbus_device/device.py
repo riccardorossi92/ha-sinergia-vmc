@@ -27,6 +27,7 @@ from modbus_connection.model.fields import boolean, enum, gauge, integer, uint32
 
 __all__ = [
     "Alarms",
+    "Calibrations",
     "TimeBandCode",
     "TimeBandSetpoints",
     "TimeBands",
@@ -432,6 +433,31 @@ def time_band(bands: TimeBands, day: str, index: int) -> tuple[int | None, int |
     return getattr(bands, f"{day}_{index}_type"), getattr(bands, f"{day}_{index}_start")
 
 
+class Calibrations(Component):
+    """Calibrazione (offset) delle sonde, EVCO PM80-PM86 (R/W).
+
+    NON documentato da Sinergia: verificato sul campo impostando M80/M86 dal
+    pannello (menù Manutentore -> CAL) e confrontando due scansioni.
+    """
+
+    register_space = "holding"
+
+    room_temperature = gauge(1616, 0.1, writable=True, unit="°C")
+    """M80 - sonda temperatura ambiente (pannello a muro), -10.0..10.0."""
+
+    outdoor_temperature = gauge(1617, 0.1, writable=True, unit="°C")
+    """M81 - sonda temperatura aria esterna, -10.0..10.0."""
+
+    water_temperature = gauge(1618, 0.1, writable=True, unit="°C")
+    """M82 - sonda temperatura acqua, -10.0..10.0."""
+
+    exhaust_temperature = gauge(1619, 0.1, writable=True, unit="°C")
+    """M83 - sonda temperatura aria espulsa, -10.0..10.0."""
+
+    room_humidity = integer(1622, writable=True, unit="%")
+    """M86 - sonda umidità ambiente (pannello a muro), -10..10."""
+
+
 class TimeBandSetpoints(Component):
     """Setpoint e velocità ventilatori per fascia oraria (R/W)."""
 
@@ -498,6 +524,7 @@ class VmcDevice(Device):
         "fan_speeds",
         "time_bands",
         "time_band_setpoints",
+        "calibrations",
     )
 
     def __init__(self, unit) -> None:  # noqa: ANN001 - ModbusUnit from modbus_connection
@@ -514,3 +541,4 @@ class VmcDevice(Device):
         self.fan_speeds = FanSpeeds(unit)
         self.time_bands = TimeBands(unit)
         self.time_band_setpoints = TimeBandSetpoints(unit)
+        self.calibrations = Calibrations(unit)
