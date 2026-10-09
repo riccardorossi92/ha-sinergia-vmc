@@ -117,7 +117,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | Registri | Contenuto | Lettura | Scrittura |
 |---|---|---|---|
 | 1499-1582 | Programma fasce orarie (tipo + orario) | ✅ coincide con il pannello | ⏳ da verificare (action `set_time_band`) |
-| 1106 | Fascia oraria attiva | ⏳ da verificare a un cambio di fascia | — |
+| 1106 | Fascia oraria attiva | ✅ segue i cambi di fascia (Comfort→Economy→Night→Economy) | — |
 | 1779 | PH03 - fasce orarie abilitate | ✅ | ⏳ da verificare |
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ⏳ da verificare |
 | 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ⏳ da verificare |
