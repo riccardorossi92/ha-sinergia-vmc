@@ -44,6 +44,12 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         min_value=0, max_value=100, step=1,
     ),
     VmcNumberSpec(
+        component="setpoints", attr="dehum_differential",
+        name="Differenziale Umidità (PU07)",
+        unique_id_suffix="setpoint_dehum_differential", unit="%",
+        min_value=0, max_value=100, step=1, diagnostic=True,
+    ),
+    VmcNumberSpec(
         component="setpoints", attr="freecooling_heating",
         name="Setpoint Free-Cooling/Heating",
         unique_id_suffix="setpoint_freecooling_heating", unit="°C",

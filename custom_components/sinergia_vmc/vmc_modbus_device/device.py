@@ -334,6 +334,13 @@ class Setpoints(Component):
     humidity = integer(1586, signed=False, writable=True, unit="%")
     """PU01 - default 55%, range 0..100."""
 
+    dehum_differential = integer(1694, signed=False, writable=True, unit="%")
+    """PU07 - differenziale deumidifica, default 10%, range 0..100. Con
+    compressore on/off la deumidifica parte sopra PU01 + PU07 e si ferma
+    sotto PU01. NON documentato da Sinergia: dedotto dal manuale EVCO c-pro 3
+    OEM DE (ordine parametri PU02..PS07, ancorato a S06=1703/S07=1704 e
+    A19=1735) e da scansione (vale 10 = default)."""
+
     freecooling_heating = gauge(1703, 0.1, writable=True, unit="°C")
     """S06 - default 4.0°C, range 0.0..68.0."""
 
