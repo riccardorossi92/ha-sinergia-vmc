@@ -120,7 +120,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 
 | Registri | Contenuto | Lettura | Scrittura |
 |---|---|---|---|
-| 1499-1582 | Programma fasce orarie (tipo + orario) | ✅ coincide con il pannello | ✅ action `set_time_band` (orari serali corretti dalla 0.7.1) |
+| 1499-1582 | Programma fasce orarie (tipo + orario) | ✅ coincide con il pannello | ✅ action `set_time_band`, anche orari serali (dalla 0.7.1) |
 | 1106 | Fascia oraria attiva | ✅ segue i cambi di fascia (Comfort→Economy→Night→Economy) | — |
 | 1779 | PH03 - fasce orarie abilitate | ✅ | ✅ il pannello passa da icona orologio (fasce) a mano (manuale) |
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ⏳ da verificare |
