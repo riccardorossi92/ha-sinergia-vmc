@@ -122,7 +122,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 |---|---|---|---|
 | 1499-1582 | Programma fasce orarie (tipo + orario) | ✅ coincide con il pannello | ⏳ da verificare (action `set_time_band`) |
 | 1106 | Fascia oraria attiva | ✅ segue i cambi di fascia (Comfort→Economy→Night→Economy) | — |
-| 1779 | PH03 - fasce orarie abilitate | ✅ | ⏳ da verificare |
+| 1779 | PH03 - fasce orarie abilitate | ✅ | ✅ il pannello passa da icona orologio (fasce) a mano (manuale) |
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ⏳ da verificare |
 | 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ⏳ da verificare |
 | 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ✅ FrC modificato dal pannello, letto da HA | ✅ FrC modificato da HA, aggiornato sul pannello |
