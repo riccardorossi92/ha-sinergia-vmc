@@ -128,7 +128,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ✅ FrC modificato dal pannello, letto da HA | ✅ FrC modificato da HA, aggiornato sul pannello |
 | 1616-1619, 1622 | Calibrazione sonde (M80-M83, M86) | ✅ verificato modificando M80/M86 dal pannello | ✅ M80/M86 azzerati da HA, aggiornati sul pannello |
 | 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
-| 1694 | PU07 - Differenziale umidità (deumidifica da PU01 + PU07 a PU01) | ✅ vale 10 (default EVCO) | ⏳ da verificare |
+| 1694 | PU07 - Differenziale umidità (deumidifica da PU01 + PU07 a PU01) | ✅ vale 10 (default EVCO) | ✅ portato a 5 con umidità 60% e setpoint 55%: la deumidifica parte subito |
 | 1602-1613 | Contatori ore, limiti, ultima manutenzione | ✅ valori plausibili | ⏳ da verificare (limiti) |
 
 ## Licenza
