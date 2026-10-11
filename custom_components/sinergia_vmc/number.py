@@ -51,13 +51,13 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
     ),
     VmcNumberSpec(
         component="setpoints", attr="freecooling_heating",
-        name="Setpoint Free-Cooling/Heating",
+        name="Setpoint Free-Cooling/Heating (S06)",
         unique_id_suffix="setpoint_freecooling_heating", unit="°C",
         min_value=0, max_value=68, step=0.5, diagnostic=True,
     ),
     VmcNumberSpec(
         component="setpoints", attr="freecooling_heating_diff",
-        name="Differenziale Free-Cooling/Heating",
+        name="Differenziale Free-Cooling/Heating (S07)",
         unique_id_suffix="setpoint_freecooling_heating_diff", unit="°C",
         min_value=0, max_value=36, step=0.5, diagnostic=True,
     ),

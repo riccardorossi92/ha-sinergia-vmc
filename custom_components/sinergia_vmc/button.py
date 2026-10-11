@@ -1,4 +1,4 @@
-"""Button: sincronizzazione dell'orologio della scheda con Home Assistant."""
+"""Button: sincronizzazione orologio e azzeramento ore filtri."""
 
 from __future__ import annotations
 
@@ -37,10 +37,42 @@ class VmcSyncClockButton(VmcEntity, ButtonEntity):
         await self._async_write(int((now - BOARD_EPOCH).total_seconds()))
 
 
+class VmcResetFilterHoursButton(VmcEntity, ButtonEntity):
+    """Dopo la pulizia/sostituzione dei filtri: azzera M01 e registra PM90.
+
+    M01 (ore ventilatore mandata) è il contatore che la scheda confronta con
+    il limite M00 per l'allarme filtri; PM90 è la data di ultima manutenzione
+    (manuale EVCO). L'azzeramento non è reversibile.
+    """
+
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_icon = "mdi:air-filter"
+
+    def __init__(self, coordinator) -> None:
+        super().__init__(
+            coordinator,
+            "maintenance",
+            "supply_fan_hours",
+            name="Azzera Ore Filtri",
+            unique_id_suffix="reset_filter_hours",
+        )
+
+    async def async_press(self) -> None:
+        now = dt_util.now().replace(tzinfo=None, microsecond=0)
+        maintenance = self.coordinator.device.maintenance
+        await maintenance.write("supply_fan_hours", 0)
+        await maintenance.write(
+            "last_maintenance", int((now - BOARD_EPOCH).total_seconds())
+        )
+        await self.coordinator.async_request_refresh()
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: SinergiaVmcConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     coordinator = entry.runtime_data
-    async_add_entities([VmcSyncClockButton(coordinator)])
+    async_add_entities(
+        [VmcSyncClockButton(coordinator), VmcResetFilterHoursButton(coordinator)]
+    )

@@ -176,7 +176,7 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
         enabled_default=False,
     ),
     VmcSensorSpec(
-        component="maintenance", attr="last_maintenance", name="Ultima Manutenzione",
+        component="maintenance", attr="last_maintenance", name="Ultima Manutenzione (PM90)",
         unique_id_suffix="last_maintenance", board_datetime=True,
         device_class=SensorDeviceClass.TIMESTAMP, entity_category="diagnostic",
     ),

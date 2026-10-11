@@ -28,6 +28,9 @@ di Home Assistant.
 - **Fasce orarie**: fascia attiva (Comfort/Economy/Night/OFF), abilitazione
   della programmazione, setpoint Comfort, offset Economy/Night e velocità
   ventilatori per fascia, programma settimanale
+- **Manutenzione filtri**: pulsante *Azzera Ore Filtri* (azzera il contatore
+  M01 usato per l'allarme filtri e registra la data in *Ultima Manutenzione
+  (PM90)*)
 - **Calibrazione sonde**: offset di temperatura ambiente (M80), umidità
   ambiente (M86), temperatura esterna/acqua/espulsione (M81-M83)
 - **Action `sinergia_vmc.set_time_band`**: modifica orario di inizio e/o
@@ -129,7 +132,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | 1616-1619, 1622 | Calibrazione sonde (M80-M83, M86) | ✅ verificato modificando M80/M86 dal pannello | ✅ M80/M86 azzerati da HA, aggiornati sul pannello |
 | 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
 | 1694 | PU07 - Differenziale umidità (deumidifica da PU01 + PU07 a PU01) | ✅ vale 10 (default EVCO) | ✅ portato a 5 con umidità 60% e setpoint 55%: la deumidifica parte subito |
-| 1602-1613 | Contatori ore, limiti, ultima manutenzione | ✅ valori plausibili | ⏳ da verificare (limiti) |
+| 1602-1613 | Contatori ore, limiti, ultima manutenzione (PM90) | ✅ valori plausibili | ⏳ da verificare (limiti, azzeramento M01, data PM90) |
 
 ## Licenza
 
