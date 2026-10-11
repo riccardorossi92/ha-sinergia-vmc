@@ -27,6 +27,7 @@ from homeassistant.helpers.selector import (
     TextSelector,
 )
 from modbus_connection import ModbusError
+from sinergia_vmc_modbus import VmcDevice
 
 from . import create_modbus_params
 from .const import (
@@ -45,7 +46,6 @@ from .const import (
     TYPE_SERIAL,
     TYPE_TCP,
 )
-from .vmc_modbus_device.device import VmcDevice
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -91,12 +91,11 @@ parità **Even**.
 La mappa dei registri si basa sul documento ufficiale *"Manuale di
 collegamento e impostazioni MODBUS HRD/HRD+"* (Sinergia, r.03_10-2023) ed è
 verificata sul campo su un'unità con elettronica CPRO3OEM-K e pannello di
-comando a muro EVJD920N2VW (la "tastiera locale" del parametro H01). Si trova in
-[`vmc_modbus_device/device.py`](custom_components/sinergia_vmc/vmc_modbus_device/device.py),
-copia della libreria Python
+comando a muro EVJD920N2VW (la "tastiera locale" del parametro H01). Si trova nella libreria Python
 [sinergia-vmc-modbus](https://github.com/riccardorossi92/sinergia-vmc-modbus),
-disponibile anche su PyPI per usarla senza Home Assistant
-(`pip install sinergia-vmc-modbus`).
+pubblicata su [PyPI](https://pypi.org/project/sinergia-vmc-modbus/): Home
+Assistant la installa automaticamente con l'integrazione, ed è utilizzabile
+anche senza Home Assistant (`pip install sinergia-vmc-modbus`).
 
 **Indirizzamento registri.** Il manuale elenca "Addr HEX" e "Addr DEC" per ogni
 registro, ma `Addr DEC = Addr HEX convertito + 1` in tutti i gruppi tranne

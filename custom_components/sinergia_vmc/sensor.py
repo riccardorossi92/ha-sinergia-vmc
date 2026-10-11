@@ -15,15 +15,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
-
-from .coordinator import SinergiaVmcConfigEntry
-from .entity import VmcEntity
-from .vmc_modbus_device.device import (
+from sinergia_vmc_modbus import (
     TIME_BAND_DAYS,
     TIME_BANDS_PER_DAY,
     TimeBandCode,
     time_band,
 )
+
+from .coordinator import SinergiaVmcConfigEntry
+from .entity import VmcEntity
 
 # La scheda segnala una sonda assente/guasta con valori sentinella
 # 0x80xx (es. 0x8004 = -32764 -> -3276.4 °C dopo la scala 0.1).

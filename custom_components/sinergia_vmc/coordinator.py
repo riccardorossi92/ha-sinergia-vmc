@@ -18,9 +18,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from modbus_connection import ModbusError, ModbusUnit
+from sinergia_vmc_modbus import VmcDevice
 
 from .const import DOMAIN
-from .vmc_modbus_device.device import VmcDevice
 
 _LOGGER = logging.getLogger(__name__)
 

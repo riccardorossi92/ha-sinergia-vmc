@@ -13,7 +13,8 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/riccardorossi92/ha-sinergia-vmc/issues",
   "requirements": [
-    "modbus-connection>=4.0.0"
+    "modbus-connection>=4.12",
+    "sinergia-vmc-modbus==0.3.0"
   ],
-  "version": "0.7.3"
+  "version": "0.8.0"
 }

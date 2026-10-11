@@ -8,16 +8,16 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
-
-from .const import DOMAIN
-from .coordinator import SinergiaVmcConfigEntry
-from .vmc_modbus_device.device import (
+from sinergia_vmc_modbus import (
     TIME_BAND_DAYS,
     TIME_BANDS_PER_DAY,
     TimeBandCode,
     async_write_time_band_start,
     time_band,
 )
+
+from .const import DOMAIN
+from .coordinator import SinergiaVmcConfigEntry
 
 SERVICE_SET_TIME_BAND = "set_time_band"
 
