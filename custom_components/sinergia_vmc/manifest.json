@@ -14,7 +14,7 @@
   "issue_tracker": "https://github.com/riccardorossi92/ha-sinergia-vmc/issues",
   "requirements": [
     "modbus-connection>=4.12",
-    "sinergia-vmc-modbus==0.4.0"
+    "sinergia-vmc-modbus==0.4.1"
   ],
-  "version": "0.9.3"
+  "version": "0.9.4"
 }
