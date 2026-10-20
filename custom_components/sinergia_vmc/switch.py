@@ -12,6 +12,9 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from .coordinator import SinergiaVmcConfigEntry
 from .entity import VmcEntity
 
+# Una scrittura alla volta sul bus seriale.
+PARALLEL_UPDATES = 1
+
 
 @dataclass(frozen=True, kw_only=True)
 class VmcSwitchSpec:
@@ -109,11 +112,9 @@ class VmcSwitch(VmcEntity, SwitchEntity):
         return self._raw_value
 
     async def async_turn_on(self, **kwargs) -> None:
+        # Per i registri a impulso (reset allarmi) la rilettura dopo la
+        # scrittura mostra lo stato reale: il dispositivo li azzera da solo.
         await self._async_write(True)
-        if self._spec.momentary:
-            # Registro a impulso: il dispositivo lo azzera da solo dopo il
-            # reset. Rileggiamo a breve per riflettere lo stato reale.
-            await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         await self._async_write(False)

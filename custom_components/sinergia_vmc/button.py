@@ -8,9 +8,12 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from .coordinator import SinergiaVmcConfigEntry
+from .coordinator import SinergiaVmcConfigEntry, modbus_write_errors
 from .entity import VmcEntity
 from .sensor import BOARD_EPOCH
+
+# Una scrittura alla volta sul bus seriale.
+PARALLEL_UPDATES = 1
 
 
 class VmcSyncClockButton(VmcEntity, ButtonEntity):
@@ -60,11 +63,12 @@ class VmcResetFilterHoursButton(VmcEntity, ButtonEntity):
     async def async_press(self) -> None:
         now = dt_util.now().replace(tzinfo=None, microsecond=0)
         maintenance = self.coordinator.device.maintenance
-        await maintenance.write("supply_fan_hours", 0)
-        await maintenance.write(
-            "last_maintenance", int((now - BOARD_EPOCH).total_seconds())
-        )
-        await self.coordinator.async_request_refresh()
+        async with modbus_write_errors(str(self.name)):
+            await maintenance.write("supply_fan_hours", 0)
+            await maintenance.write(
+                "last_maintenance", int((now - BOARD_EPOCH).total_seconds())
+            )
+        await self.coordinator.async_refresh_after_write()
 
 
 async def async_setup_entry(

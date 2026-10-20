@@ -96,5 +96,10 @@
         }
       }
     }
+  },
+  "exceptions": {
+    "write_failed": {
+      "message": "Scrittura di {target} sulla VMC non riuscita: {error}"
+    }
   }
 }

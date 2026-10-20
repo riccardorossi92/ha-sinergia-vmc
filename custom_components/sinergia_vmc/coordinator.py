@@ -10,11 +10,15 @@ la connessione seriale è condivisa tramite ``homeassistant.components.modbus``
 from __future__ import annotations
 
 import logging
+import time
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import timedelta
 from typing import override
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from modbus_connection import ModbusError, ModbusUnit
@@ -25,6 +29,29 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 type SinergiaVmcConfigEntry = ConfigEntry[VmcCoordinator]
+
+# Valori che cambiano da soli: letti a ogni ciclo.
+LIVE_COMPONENTS: tuple[str, ...] = ("probes", "outputs", "alarms", "digital_io", "status")
+# Parametri che cambiano solo se modificati (da HA o dal pannello): sul bus
+# RS-485 a 9600 baud sono ~20 delle 27 richieste di un ciclo completo, quindi
+# si rileggono di rado e subito dopo ogni scrittura da Home Assistant.
+CONFIG_COMPONENTS: tuple[str, ...] = tuple(
+    name for name in VmcDevice.COMPONENT_NAMES if name not in LIVE_COMPONENTS
+)
+CONFIG_POLL_INTERVAL = 300  # secondi
+
+
+@asynccontextmanager
+async def modbus_write_errors(target: str) -> AsyncIterator[None]:
+    """Trasforma un errore Modbus in scrittura in un errore leggibile in HA."""
+    try:
+        yield
+    except ModbusError as err:
+        raise HomeAssistantError(
+            translation_domain=DOMAIN,
+            translation_key="write_failed",
+            translation_placeholders={"target": target, "error": str(err)},
+        ) from err
 
 
 class VmcCoordinator(DataUpdateCoordinator[None]):
@@ -48,6 +75,7 @@ class VmcCoordinator(DataUpdateCoordinator[None]):
             always_update=True,
         )
         self.device = VmcDevice(unit)
+        self._config_polled_at: float | None = None
         self.device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name="Sinergia VMC",
@@ -55,16 +83,30 @@ class VmcCoordinator(DataUpdateCoordinator[None]):
             model="CPRO3OEM-K / HRD-HRD+",
         )
 
+    async def async_refresh_after_write(self) -> None:
+        """Rilegge tutto (parametri compresi) dopo una scrittura da HA."""
+        self._config_polled_at = None
+        await self.async_request_refresh()
+
     @override
     async def _async_update_data(self) -> None:
+        now = time.monotonic()
+        poll_config = (
+            self._config_polled_at is None
+            or now - self._config_polled_at >= CONFIG_POLL_INTERVAL
+        )
+        names = LIVE_COMPONENTS + CONFIG_COMPONENTS if poll_config else LIVE_COMPONENTS
         try:
-            report = await self.device.async_poll(self.device.COMPONENT_NAMES)
+            report = await self.device.async_poll(names)
         except ModbusError as err:
             # Connessione persa o nessuna risposta: HA riprova al prossimo
             # ciclo e, se accade durante il primo refresh, async_config_entry
             # _first_refresh() lo trasforma automaticamente in
             # ConfigEntryNotReady.
             raise UpdateFailed(f"Errore Modbus: {err}") from err
+
+        if poll_config:
+            self._config_polled_at = now
 
         if report.failed:
             # Alcuni gruppi possono non rispondere (es. sonde sul pannello

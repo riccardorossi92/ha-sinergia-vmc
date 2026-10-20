@@ -33,6 +33,9 @@ PROBE_ERROR_THRESHOLD = -3000.0
 # sul pannello (senza fuso orario).
 BOARD_EPOCH = datetime(2000, 1, 1)
 
+# Aggiornati dal coordinator.
+PARALLEL_UPDATES = 0
+
 
 @dataclass(frozen=True, kw_only=True)
 class VmcSensorSpec:

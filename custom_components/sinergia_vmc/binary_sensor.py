@@ -14,6 +14,9 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from .coordinator import SinergiaVmcConfigEntry
 from .entity import VmcEntity
 
+# Aggiornati dal coordinator.
+PARALLEL_UPDATES = 0
+
 
 @dataclass(frozen=True, kw_only=True)
 class VmcBinarySensorSpec:

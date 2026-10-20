@@ -16,5 +16,5 @@
     "modbus-connection>=4.12",
     "sinergia-vmc-modbus==0.4.0"
   ],
-  "version": "0.9.0"
+  "version": "0.9.1"
 }

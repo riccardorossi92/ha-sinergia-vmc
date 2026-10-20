@@ -12,6 +12,9 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from .coordinator import SinergiaVmcConfigEntry
 from .entity import VmcEntity
 
+# Una scrittura alla volta sul bus seriale.
+PARALLEL_UPDATES = 1
+
 
 @dataclass(frozen=True, kw_only=True)
 class VmcNumberSpec:

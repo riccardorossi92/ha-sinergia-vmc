@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .coordinator import VmcCoordinator
+from .coordinator import VmcCoordinator, modbus_write_errors
 
 
 class VmcEntity(CoordinatorEntity[VmcCoordinator]):
@@ -37,5 +37,6 @@ class VmcEntity(CoordinatorEntity[VmcCoordinator]):
         return getattr(self._component, self._attr_name_key)
 
     async def _async_write(self, value) -> None:
-        await self._component.write(self._attr_name_key, value)
-        await self.coordinator.async_request_refresh()
+        async with modbus_write_errors(str(self.name)):
+            await self._component.write(self._attr_name_key, value)
+        await self.coordinator.async_refresh_after_write()

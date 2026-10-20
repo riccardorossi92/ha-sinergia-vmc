@@ -17,7 +17,7 @@ from sinergia_vmc_modbus import (
 )
 
 from .const import DOMAIN
-from .coordinator import SinergiaVmcConfigEntry
+from .coordinator import SinergiaVmcConfigEntry, modbus_write_errors
 
 SERVICE_SET_TIME_BAND = "set_time_band"
 
@@ -100,12 +100,13 @@ async def _async_set_time_band(hass: HomeAssistant, call: ServiceCall) -> None:
             )
 
     for day in call.data[ATTR_DAYS]:
-        if new_mode is not None:
-            await bands.write(f"{day}_{index}_type", int(new_mode))
-        if new_start is not None:
-            await async_write_time_band_start(bands, day, index, new_start)
+        async with modbus_write_errors(f"{day} fascia {index}"):
+            if new_mode is not None:
+                await bands.write(f"{day}_{index}_type", int(new_mode))
+            if new_start is not None:
+                await async_write_time_band_start(bands, day, index, new_start)
 
-    await coordinator.async_request_refresh()
+    await coordinator.async_refresh_after_write()
 
 
 def async_setup_services(hass: HomeAssistant) -> None:
