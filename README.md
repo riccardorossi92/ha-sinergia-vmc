@@ -111,6 +111,12 @@ la scrittura sul 1140 è verificata sul campo: la scheda tiene la richiesta.
 In inverno non la esegue se la deumidifica invernale è disabilitata (PU02, di
 fabbrica 0); l'esecuzione in estate è ancora da verificare. Sulla 1141 la scrittura falliva con *Modbus Exception 0x02*.
 
+**PA58 (tempo massimo warning alta umidità).** Il manuale non ne indica l'unità:
+è in **minuti**, verificato sul campo con PA58 = 90. Il primo AL01 (warning alta
+umidità, soglia A19) è scattato alle 18:02 e AL02 (allarme, riarmo manuale) alle
+19:31, esattamente 90 minuti dopo. Il conteggio non si è azzerato quando AL01 è
+rientrato per pochi minuti.
+
 **Fasce orarie.** I registri della programmazione a fasce non sono documentati
 da Sinergia: sono stati ricavati incrociando una scansione completa dei
 registri con il manuale EVCO *c-pro 3 OEM DE* (l'ordine dei parametri coincide
