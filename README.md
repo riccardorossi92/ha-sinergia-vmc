@@ -105,6 +105,11 @@ registro, ma `Addr DEC = Addr HEX convertito + 1` in tutti i gruppi tranne
 "COMANDI TEST" (dove sembrano coincidere, probabile refuso). Gli indirizzi
 usati qui sono quelli reali da chiamare via Modbus (`Addr HEX` / `Addr DEC - 1`),
 verificati incrociando 12+ registri con una scansione RS-485 reale della stessa VMC.
+Vale anche per le richieste da BMS: integrazione `0x0473` = **1139** e
+deumidifica `0x0474` = **1140** (non 1140/1141 come in "Addr DEC"). Dalla 0.9.4
+la scrittura sul 1140 è verificata sul campo: la scheda tiene la richiesta, e
+in estate la esegue (in inverno solo se abilitata con PU02, di fabbrica 0 =
+disabilitata). Sulla 1141 la scrittura falliva con *Modbus Exception 0x02*.
 
 **Fasce orarie.** I registri della programmazione a fasce non sono documentati
 da Sinergia: sono stati ricavati incrociando una scansione completa dei
