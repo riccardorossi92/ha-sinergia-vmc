@@ -37,16 +37,6 @@
       "already_configured": "This VMC unit is already configured."
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Sinergia VMC options",
-        "data": {
-          "scan_interval": "Update interval (seconds)"
-        }
-      }
-    }
-  },
   "selector": {
     "days": {
       "options": {

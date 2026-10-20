@@ -37,16 +37,6 @@
       "already_configured": "Questa unità VMC è già configurata."
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Opzioni Sinergia VMC",
-        "data": {
-          "scan_interval": "Intervallo di aggiornamento (secondi)"
-        }
-      }
-    }
-  },
   "selector": {
     "days": {
       "options": {

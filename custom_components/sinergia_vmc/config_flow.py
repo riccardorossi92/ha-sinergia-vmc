@@ -7,15 +7,14 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.components.modbus import async_get_temporary_unit
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import (
     CONF_DEVICE,
     CONF_HOST,
     CONF_PORT,
-    CONF_SCAN_INTERVAL,
     CONF_TYPE,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
     NumberSelector,
@@ -37,7 +36,6 @@ from .const import (
     CONF_UNIT,
     DEFAULT_BAUDRATE,
     DEFAULT_PARITY,
-    DEFAULT_SCAN_INTERVAL,
     DEFAULT_STOPBITS,
     DEFAULT_TCP_PORT,
     DEFAULT_UNIT,
@@ -172,35 +170,4 @@ class SinergiaVmcConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id=connection_type, data_schema=schema, errors=errors
-        )
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry) -> OptionsFlow:
-        return SinergiaVmcOptionsFlow()
-
-
-class SinergiaVmcOptionsFlow(OptionsFlow):
-    """Permette di cambiare l'intervallo di aggiornamento a runtime."""
-
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
-
-        current = self.config_entry.options.get(
-            CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
-        )
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_SCAN_INTERVAL, default=current): NumberSelector(
-                        NumberSelectorConfig(
-                            min=5, max=300, step=5, unit_of_measurement="s"
-                        )
-                    ),
-                }
-            ),
         )

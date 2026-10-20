@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 DOMAIN = "sinergia_vmc"
 
 CONF_BAUDRATE = "baudrate"
@@ -26,7 +28,8 @@ DEFAULT_BAUDRATE = 9600
 DEFAULT_PARITY = "N"
 DEFAULT_STOPBITS = 1
 DEFAULT_UNIT = 1
-DEFAULT_SCAN_INTERVAL = 30  # secondi
+# Intervallo fisso (linee guida HA: niente intervallo configurabile dall'utente).
+SCAN_INTERVAL = timedelta(seconds=30)
 
 # Porta Modbus TCP standard. Molti gateway (es. Waveshare RS485 TO ETH)
 # passano automaticamente a questa porta quando si attiva la modalità
