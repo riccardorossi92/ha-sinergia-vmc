@@ -22,5 +22,3 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
-          # brands: richiesto solo per l'inclusione nel default store di HACS
-          ignore: brands

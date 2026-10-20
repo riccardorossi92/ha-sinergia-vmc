@@ -2,5 +2,8 @@
   "name": "Sinergia VMC (Modbus)",
   "content_in_root": false,
   "render_readme": true,
-  "country": ["IT"]
+  "country": [
+    "IT"
+  ],
+  "homeassistant": "2026.9.0"
 }
