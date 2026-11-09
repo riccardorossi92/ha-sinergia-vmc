@@ -1,6 +1,6 @@
 # Sinergia VMC (Modbus) per Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
 [![Validate](https://github.com/riccardorossi92/ha-sinergia-vmc/actions/workflows/validate.yml/badge.svg)](https://github.com/riccardorossi92/ha-sinergia-vmc/actions/workflows/validate.yml)
 
 Integrazione custom di Home Assistant per le unità VMC **Sinergia** con
@@ -58,10 +58,21 @@ nulla. Per togliere una fascia usa `mode: disabled`.
 
 ### HACS (consigliato)
 
-1. HACS → menu ⋮ → **Repository personalizzati**
-2. URL: `https://github.com/riccardorossi92/ha-sinergia-vmc`, categoria **Integrazione**
-3. Cerca "Sinergia VMC (Modbus)" e installa
-4. Riavvia Home Assistant
+L'integrazione è nel catalogo predefinito di HACS.
+
+[![Apri in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=riccardorossi92&repository=ha-sinergia-vmc&category=integration)
+
+1. In HACS cerca **"Sinergia VMC (Modbus)"** (oppure usa il pulsante qui sopra)
+2. Premi **Scarica**
+3. Riavvia Home Assistant
+
+Richiede Home Assistant **2026.9.0** o successivo.
+
+Se non la trovi nella ricerca (ad esempio con una versione di HACS non
+aggiornata), puoi aggiungerla come repository personalizzato: HACS → menu ⋮ →
+**Repository personalizzati** → URL
+`https://github.com/riccardorossi92/ha-sinergia-vmc`, categoria
+**Integrazione**.
 
 ### Manuale
 
