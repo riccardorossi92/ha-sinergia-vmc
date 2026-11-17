@@ -54,6 +54,37 @@ Gli orari delle fasce attive di un giorno devono restare crescenti: se la
 modifica li renderebbe disordinati l'action viene rifiutata senza scrivere
 nulla. Per togliere una fascia usa `mode: disabled`.
 
+## Velocità in regolazione manuale
+
+Con le fasce orarie disattivate (switch *Fasce Orarie Abilitate (PH03)*
+spento, icona della mano sul pannello) i ventilatori girano alle velocità
+manuali:
+
+- **Velocità Mandata Manuale** (sensore): si imposta solo dal pannello a muro.
+  Il pannello la tiene nella sua memoria e la riscrive di continuo sulla
+  scheda, quindi una scrittura via Modbus verrebbe annullata subito.
+- **Velocità Ripresa Manuale** (number): si imposta dal pannello o da Home
+  Assistant.
+
+La freccia del pannello aggiunge o toglie **5 punti a entrambe**, ognuna
+fermandosi ai propri limiti: mandata tra **F07 e F08**, ripresa tra **F29 e
+F30** (sulla macchina di test 15-100% e 40-75%). Non esiste un parametro
+"scarto": la differenza tra le due cambia solo quando una delle due è ferma a
+un limite. Esempio con mandata 15% e ripresa 40%:
+
+| Pressioni ▲ | Mandata | Ripresa | Note |
+|---|---|---|---|
+| 0 | 15% | 40% | scarto 25 |
+| 7 | 50% | 75% | la ripresa arriva al massimo F30 |
+| 12 | 75% | 75% | sale solo la mandata: ora sono pari |
+| oltre | 80%… | 75% | la ripresa resta ferma, lo scarto si ricrea |
+
+Mandata e ripresa restano quindi uguali solo tra 40% e 75%; sotto il 40% la
+ripresa si ferma al minimo mentre la mandata continua a scendere. Per
+scegliere lo scarto senza arrivare ai limiti: imposta la mandata con la
+freccia del pannello e poi la ripresa da Home Assistant (*Velocità Ripresa
+Manuale*, valori ammessi da F29 a F30).
+
 ## Installazione
 
 ### HACS (consigliato)
@@ -151,7 +182,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ✅ ogni registro scritto (±0,5 °C), riletto via Modbus e ripristinato |
 | 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ✅ FSE/FSN portati a 70% da HA, riletti 7000 via Modbus |
 | 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ✅ FrC modificato dal pannello, letto da HA | ✅ FrC modificato da HA, aggiornato sul pannello |
-| 1614, 1858 | Velocità mandata/ripresa in regolazione manuale (fasce orarie disattivate) | ✅ cambiate dal pannello con le frecce: 15→65% e 40→75%, seguite dalle uscite 639/640 | ✅ ripresa (1858): 40% e 50% scritti via Modbus, tenuti e seguiti dall'uscita 640; ❌ mandata (1614): la comanda il pannello a muro, che sovrascrive le scritture Modbus → in Home Assistant è un sensore |
+| 1614, 1858 | Velocità mandata/ripresa in regolazione manuale (fasce orarie disattivate) | ✅ cambiate dal pannello con la freccia (+5 punti a entrambe, 15→50% e 40→75%), seguite dalle uscite 639/640; il confronto completo prima/dopo non mostra altri registri di impostazione (solo le copie di stato 1114/1136) | ✅ ripresa (1858): 40% e 50% scritti via Modbus, tenuti e seguiti dall'uscita 640; ❌ mandata (1614): la comanda il pannello a muro, che sovrascrive le scritture Modbus → in Home Assistant è un sensore |
 | 1616-1619, 1622 | Calibrazione sonde (M80-M83, M86) | ✅ verificato modificando M80/M86 dal pannello | ✅ M80/M86 azzerati da HA, aggiornati sul pannello |
 | 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
 | 1694 | PU07 - Differenziale umidità (deumidifica da PU01 + PU07 a PU01) | ✅ vale 10 (default EVCO) | ✅ portato a 5 con umidità 60% e setpoint 55%: la deumidifica parte subito |
