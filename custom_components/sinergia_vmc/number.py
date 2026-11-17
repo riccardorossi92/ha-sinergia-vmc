@@ -92,6 +92,19 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         enabled_default=False,
     ),
     # --- Velocità ventilatori ---
+    # Usate in regolazione manuale (fasce orarie disattivate, PH03 spento).
+    VmcNumberSpec(
+        component="fan_speeds", attr="manual_supply",
+        name="Velocità Mandata Manuale",
+        unique_id_suffix="fan_manual_supply", unit="%",
+        min_value=0, max_value=100, step=1,
+    ),
+    VmcNumberSpec(
+        component="fan_speeds", attr="manual_return",
+        name="Velocità Ripresa Manuale",
+        unique_id_suffix="fan_manual_return", unit="%",
+        min_value=0, max_value=100, step=1,
+    ),
     VmcNumberSpec(
         component="fan_speeds", attr="min_supply_vmc_mode",
         name="Velocità Min. Mandata - Modo VMC (F07)",

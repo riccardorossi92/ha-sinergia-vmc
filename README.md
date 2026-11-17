@@ -24,7 +24,7 @@ di Home Assistant.
   stato unità, ore di funzionamento
 - **Sensori binari**: allarmi e ingressi/uscite digitali
 - **Switch**: accensione, modalità estate/inverno, abilitazioni BMS
-- **Number**: setpoint e velocità ventilatori
+- **Number**: setpoint e velocità ventilatori (anche in regolazione manuale)
 - **Fasce orarie**: fascia attiva (Comfort/Economy/Night/OFF), abilitazione
   della programmazione, setpoint Comfort, offset Economy/Night e velocità
   ventilatori per fascia, programma settimanale
@@ -151,6 +151,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ✅ ogni registro scritto (±0,5 °C), riletto via Modbus e ripristinato |
 | 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ✅ FSE/FSN portati a 70% da HA, riletti 7000 via Modbus |
 | 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ✅ FrC modificato dal pannello, letto da HA | ✅ FrC modificato da HA, aggiornato sul pannello |
+| 1614, 1858 | Velocità mandata/ripresa in regolazione manuale (fasce orarie disattivate) | ✅ cambiate dal pannello con le frecce: 15→65% e 40→75%, seguite dalle uscite 639/640 | ⏳ da verificare |
 | 1616-1619, 1622 | Calibrazione sonde (M80-M83, M86) | ✅ verificato modificando M80/M86 dal pannello | ✅ M80/M86 azzerati da HA, aggiornati sul pannello |
 | 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
 | 1694 | PU07 - Differenziale umidità (deumidifica da PU01 + PU07 a PU01) | ✅ vale 10 (default EVCO) | ✅ portato a 5 con umidità 60% e setpoint 55%: la deumidifica parte subito |
