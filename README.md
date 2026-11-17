@@ -151,7 +151,7 @@ stessa macchina e puoi confermarne (o smentirne) uno, apri una
 | 1587-1592 | Setpoint Comfort, offset Economy/Night | ✅ coincidono con il pannello | ✅ ogni registro scritto (±0,5 °C), riletto via Modbus e ripristinato |
 | 1595-1597 | Velocità mandata per fascia (FSC/FSE/FSN) | ✅ coincidono con il pannello | ✅ FSE/FSN portati a 70% da HA, riletti 7000 via Modbus |
 | 1859-1861 | Velocità ripresa per fascia (FRC/FRE/FRN) | ✅ FrC modificato dal pannello, letto da HA | ✅ FrC modificato da HA, aggiornato sul pannello |
-| 1614, 1858 | Velocità mandata/ripresa in regolazione manuale (fasce orarie disattivate) | ✅ cambiate dal pannello con le frecce: 15→65% e 40→75%, seguite dalle uscite 639/640 | ⏳ da verificare |
+| 1614, 1858 | Velocità mandata/ripresa in regolazione manuale (fasce orarie disattivate) | ✅ cambiate dal pannello con le frecce: 15→65% e 40→75%, seguite dalle uscite 639/640 | ✅ ripresa (1858): 40% e 50% scritti via Modbus, tenuti e seguiti dall'uscita 640; ❌ mandata (1614): la comanda il pannello a muro, che sovrascrive le scritture Modbus → in Home Assistant è un sensore |
 | 1616-1619, 1622 | Calibrazione sonde (M80-M83, M86) | ✅ verificato modificando M80/M86 dal pannello | ✅ M80/M86 azzerati da HA, aggiornati sul pannello |
 | 1101-1102 | Orologio della scheda | ✅ | ✅ (Sincronizza Orologio) |
 | 1694 | PU07 - Differenziale umidità (deumidifica da PU01 + PU07 a PU01) | ✅ vale 10 (default EVCO) | ✅ portato a 5 con umidità 60% e setpoint 55%: la deumidifica parte subito |

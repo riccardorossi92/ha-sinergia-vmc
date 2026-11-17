@@ -92,13 +92,9 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         enabled_default=False,
     ),
     # --- Velocità ventilatori ---
-    # Usate in regolazione manuale (fasce orarie disattivate, PH03 spento).
-    VmcNumberSpec(
-        component="fan_speeds", attr="manual_supply",
-        name="Velocità Mandata Manuale",
-        unique_id_suffix="fan_manual_supply", unit="%",
-        min_value=0, max_value=100, step=1,
-    ),
+    # Usata in regolazione manuale (fasce orarie disattivate, PH03 spento).
+    # La velocità mandata manuale (1614) è invece un sensore: la comanda il
+    # pannello a muro, che riscrive il suo valore e ignora le scritture Modbus.
     VmcNumberSpec(
         component="fan_speeds", attr="manual_return",
         name="Velocità Ripresa Manuale",

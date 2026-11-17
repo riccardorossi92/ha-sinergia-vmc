@@ -111,6 +111,12 @@ SENSORS: tuple[VmcSensorSpec, ...] = (
         unique_id_suffix="external_damper_pct", unit="%", state_class=SensorStateClass.MEASUREMENT,
         enabled_default=False,
     ),
+    # Velocità mandata in regolazione manuale: impostata solo dal pannello a
+    # muro (le scritture Modbus sul 1614 vengono sovrascritte dal pannello).
+    VmcSensorSpec(
+        component="fan_speeds", attr="manual_supply", name="Velocità Mandata Manuale",
+        unique_id_suffix="fan_manual_supply", unit="%", state_class=SensorStateClass.MEASUREMENT,
+    ),
     # --- Stato unità ---
     VmcSensorSpec(
         component="status", attr="unit_status", name="Stato Unità",
