@@ -30,10 +30,13 @@ _LOGGER = logging.getLogger(__name__)
 
 type SinergiaVmcConfigEntry = ConfigEntry[VmcCoordinator]
 
-# Valori che cambiano da soli: letti a ogni ciclo.
-LIVE_COMPONENTS: tuple[str, ...] = ("probes", "outputs", "alarms", "digital_io", "status")
+# Valori che cambiano da soli: letti a ogni ciclo. fan_speeds comprende le
+# velocità in regolazione manuale, che si cambiano spesso dal pannello a muro.
+LIVE_COMPONENTS: tuple[str, ...] = (
+    "probes", "outputs", "alarms", "digital_io", "status", "fan_speeds",
+)
 # Parametri che cambiano solo se modificati (da HA o dal pannello): sul bus
-# RS-485 a 9600 baud sono ~20 delle 27 richieste di un ciclo completo, quindi
+# RS-485 a 9600 baud sono la maggior parte delle richieste di un ciclo completo, quindi
 # si rileggono di rado e subito dopo ogni scrittura da Home Assistant.
 CONFIG_COMPONENTS: tuple[str, ...] = tuple(
     name for name in VmcDevice.COMPONENT_NAMES if name not in LIVE_COMPONENTS

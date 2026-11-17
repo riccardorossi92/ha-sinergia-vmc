@@ -28,6 +28,10 @@ class VmcNumberSpec:
     step: float
     diagnostic: bool = False
     enabled_default: bool = True
+    # Limiti presi dalla scheda (campi di fan_speeds): la scheda rifiuta con
+    # Modbus 0x04 i valori fuori da F07-F08 (mandata) e F29-F30 (ripresa).
+    min_attr: str | None = None
+    max_attr: str | None = None
 
 
 NUMBERS: tuple[VmcNumberSpec, ...] = (
@@ -100,6 +104,7 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         name="Velocità Ripresa Manuale",
         unique_id_suffix="fan_manual_return", unit="%",
         min_value=0, max_value=100, step=1,
+        min_attr="min_return", max_attr="max_return",
     ),
     VmcNumberSpec(
         component="fan_speeds", attr="min_supply_vmc_mode",
@@ -199,36 +204,42 @@ NUMBERS: tuple[VmcNumberSpec, ...] = (
         name="Velocità Mandata Comfort (FSC)",
         unique_id_suffix="tb_supply_fan_comfort", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        min_attr="min_supply_vmc_mode", max_attr="max_supply_vmc_mode",
     ),
     VmcNumberSpec(
         component="time_band_setpoints", attr="supply_fan_economy",
         name="Velocità Mandata Economy (FSE)",
         unique_id_suffix="tb_supply_fan_economy", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        min_attr="min_supply_vmc_mode", max_attr="max_supply_vmc_mode",
     ),
     VmcNumberSpec(
         component="time_band_setpoints", attr="supply_fan_night",
         name="Velocità Mandata Night (FSN)",
         unique_id_suffix="tb_supply_fan_night", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        min_attr="min_supply_vmc_mode", max_attr="max_supply_vmc_mode",
     ),
     VmcNumberSpec(
         component="time_band_setpoints", attr="return_fan_comfort",
         name="Velocità Ripresa Comfort (FRC)",
         unique_id_suffix="tb_return_fan_comfort", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        min_attr="min_return", max_attr="max_return",
     ),
     VmcNumberSpec(
         component="time_band_setpoints", attr="return_fan_economy",
         name="Velocità Ripresa Economy (FRE)",
         unique_id_suffix="tb_return_fan_economy", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        min_attr="min_return", max_attr="max_return",
     ),
     VmcNumberSpec(
         component="time_band_setpoints", attr="return_fan_night",
         name="Velocità Ripresa Night (FRN)",
         unique_id_suffix="tb_return_fan_night", unit="%",
         min_value=0, max_value=100, step=1, diagnostic=True,
+        min_attr="min_return", max_attr="max_return",
     ),
     # --- Calibrazione sonde ---
     VmcNumberSpec(
@@ -294,13 +305,27 @@ class VmcNumber(VmcEntity, NumberEntity):
             name=spec.name,
             unique_id_suffix=spec.unique_id_suffix,
         )
+        self._spec = spec
         self._attr_native_unit_of_measurement = spec.unit
-        self._attr_native_min_value = spec.min_value
-        self._attr_native_max_value = spec.max_value
         self._attr_native_step = spec.step
         self._attr_entity_registry_enabled_default = spec.enabled_default
         if spec.diagnostic:
             self._attr_entity_category = EntityCategory.CONFIG
+
+    def _board_limit(self, attr: str | None) -> float | None:
+        if attr is None:
+            return None
+        return getattr(self.coordinator.device.fan_speeds, attr)
+
+    @property
+    def native_min_value(self) -> float:
+        limit = self._board_limit(self._spec.min_attr)
+        return self._spec.min_value if limit is None else limit
+
+    @property
+    def native_max_value(self) -> float:
+        limit = self._board_limit(self._spec.max_attr)
+        return self._spec.max_value if limit is None else limit
 
     @property
     def native_value(self) -> float | None:
