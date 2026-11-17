@@ -85,6 +85,14 @@ scegliere lo scarto senza arrivare ai limiti: imposta la mandata con la
 freccia del pannello e poi la ripresa da Home Assistant (*Velocità Ripresa
 Manuale*, valori ammessi da F29 a F30).
 
+Attivando le fasce orarie (PH03 acceso) la regolazione manuale si disattiva:
+la scheda riporta entrambe le velocità manuali **al loro minimo** (mandata a
+F07, ripresa a F29: sulla macchina di test 15% e 40%) e i ventilatori seguono
+le velocità della fascia attiva (FSC/FSE/FSN e FRC/FRE/FRN). In questa
+modalità *Velocità Ripresa Manuale* non ha effetto. Tornando in manuale le
+velocità vanno quindi reimpostate (freccia del pannello e, per la ripresa,
+anche Home Assistant).
+
 ## Installazione
 
 ### HACS (consigliato)
