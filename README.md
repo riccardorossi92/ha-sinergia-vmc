@@ -10,10 +10,10 @@ RS-485 — tramite adattatore USB-RS485 diretto oppure gateway RS485↔Ethernet
 
 Testata su un'unità **HRD 30/15 H K DC** (taglia 30/15, orizzontale, elettronica
 **CPRO3OEM-K**, versione DC deumidifica + integrazione caldo/freddo con
-compressore on/off R134A), prodotta da Sinergia e commercializzata come
-Termomarket / innova. Attenzione: nelle unità più recenti (manuale innova 2026)
-la versione DC ha invece compressore inverter, con sonda di evaporazione e
-uscita compressore modulante (registri 511 e 641), assenti sulla versione on/off.
+compressore on/off R134A), prodotta da Sinergia. Attenzione: nelle unità più
+recenti (manuale d'installazione HRD H N421328A Rev.03 03/2026) la versione DC
+ha invece compressore inverter, con sonda di evaporazione e uscita compressore
+modulante (registri 511 e 641), assenti sulla versione on/off.
 
 Usa la connessione Modbus condivisa fornita dall'integrazione core `modbus`
 di Home Assistant.
