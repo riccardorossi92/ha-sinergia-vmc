@@ -9,6 +9,7 @@ la connessione seriale è condivisa tramite ``homeassistant.components.modbus``
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from collections.abc import AsyncIterator
@@ -21,7 +22,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from modbus_connection import ModbusError, ModbusUnit
+from modbus_connection import (
+    ModbusConnectionError,
+    ModbusError,
+    ModbusTimeoutError,
+    ModbusUnit,
+)
 from sinergia_vmc_modbus import VmcDevice
 
 from .const import DOMAIN
@@ -42,6 +48,9 @@ CONFIG_COMPONENTS: tuple[str, ...] = tuple(
     name for name in VmcDevice.COMPONENT_NAMES if name not in LIVE_COMPONENTS
 )
 CONFIG_POLL_INTERVAL = 300  # secondi
+# Pausa prima di ripetere una lettura interrotta da un problema di connessione
+# (es. il gateway RS485-Ethernet che chiude la connessione TCP).
+RETRY_DELAY = 1  # secondi
 
 
 @asynccontextmanager
@@ -91,6 +100,19 @@ class VmcCoordinator(DataUpdateCoordinator[None]):
         self._config_polled_at = None
         await self.async_request_refresh()
 
+    async def _async_poll(self, names: tuple[str, ...]):
+        """Legge i componenti, ripetendo una volta se cade la connessione.
+
+        Solo per errori di connessione/timeout: la libreria si ricollega alla
+        richiesta successiva. Gli errori restituiti dalla VMC non si ripetono.
+        """
+        try:
+            return await self.device.async_poll(names)
+        except (ModbusConnectionError, ModbusTimeoutError) as err:
+            _LOGGER.debug("Lettura interrotta (%s), nuovo tentativo", err)
+            await asyncio.sleep(RETRY_DELAY)
+            return await self.device.async_poll(names)
+
     @override
     async def _async_update_data(self) -> None:
         now = time.monotonic()
@@ -100,7 +122,7 @@ class VmcCoordinator(DataUpdateCoordinator[None]):
         )
         names = LIVE_COMPONENTS + CONFIG_COMPONENTS if poll_config else LIVE_COMPONENTS
         try:
-            report = await self.device.async_poll(names)
+            report = await self._async_poll(names)
         except ModbusError as err:
             # Connessione persa o nessuna risposta: HA riprova al prossimo
             # ciclo e, se accade durante il primo refresh, async_config_entry
